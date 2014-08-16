@@ -13,13 +13,13 @@ local distToTarget = nil
 local currentDistToTarget = nil
 local pauseMove = nil
 
-function Hunter:create(sceneGroup)
-	self.container = sceneGroup
+function Hunter:create(group)
+	self.container = group
 	self.view = display.newImage("i/skin_1.png",0,0)
 	self.view.x = display.contentCenterX
 	self.view.y = display.contentCenterY
 
-	sceneGroup:insert(self.view)
+	self.container:insert(self.view)
 	self.speed = 10
 	self.vx = 0
 	self.vy = 0
@@ -65,8 +65,6 @@ function Hunter:getDistance(x,y)
 end
 
 function Hunter:move(x,y)
-	-- transition.cancel(self.view)
-	-- transition.to(self.view, { time=d/self.speed*1000,x=dx,y=dy })
 	self.pauseMove = false
 	self.targetX = x
 	self.targetY = y
@@ -84,11 +82,5 @@ function Hunter:move(x,y)
 
 end
 
-
---         _dstToTarget -= Math.abs(_dstToTarget - _currentDstToTarget);
---         if (_dstToTarget <= 0)
---          this.stopMoving();
--- _dstToTarget -- это мы сохраняем когда начинаем движение
--- _currentDstToTarget -- это каждый тик высчитывается
 
 return Hunter

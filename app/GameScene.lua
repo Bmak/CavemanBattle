@@ -9,6 +9,7 @@ local sceneName = GameScene
 local composer = require( "composer" )
 local tileMap = require("app.map.TileMap")
 local hunter = require("app.obj.Hunter")
+local objControl = require("app.ObjectControl")
 
 -- Load scene with same root filename as this file
 local scene = composer.newScene( sceneName )
@@ -27,12 +28,13 @@ end
 function scene:onHunterMove(event)
 	if event.phase == "moved" or event.phase == "began" then
 
-		hunter:move(event.x,event.y)
+		hunter:move(event.x - tileMap.mapCont.x,event.y - tileMap.mapCont.y)
 	end
 end
 
 function scene:worldTick( event )
 	hunter:tick(event)
+    tileMap:tick(event)
 end
 
 function scene:show( event )
@@ -49,7 +51,10 @@ function scene:show( event )
 
 
         tileMap:create(sceneGroup)
-        hunter:create(sceneGroup)
+        objControl:create(tileMap.mapCont)
+        hunter:create(tileMap.mapCont)
+        tileMap:setHero(hunter)
+
 
         local function moveTouch(event)
         	self:onHunterMove(event)
@@ -57,7 +62,7 @@ function scene:show( event )
         local function onTick(event)
         	self:worldTick(event)
         end
-        sceneGroup:addEventListener( "touch", moveTouch )
+        tileMap.mapCont:addEventListener( "touch", moveTouch )
       	Runtime:addEventListener( "enterFrame", onTick )
     end 
 end
