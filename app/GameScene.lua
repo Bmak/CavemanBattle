@@ -9,7 +9,9 @@ local sceneName = GameScene
 local composer = require( "composer" )
 local tileMap = require("app.map.TileMap")
 local hunter = require("app.obj.Hunter")
+local Duck = require("app.obj.Duck")
 local objControl = require("app.ObjectControl")
+local movingControl = require("app.MovingControl")
 
 -- Load scene with same root filename as this file
 local scene = composer.newScene( sceneName )
@@ -27,14 +29,15 @@ end
 
 function scene:onHunterMove(event)
 	if event.phase == "moved" or event.phase == "began" then
-
 		hunter:move(event.x - tileMap.mapCont.x,event.y - tileMap.mapCont.y)
 	end
 end
 
 function scene:worldTick( event )
-	hunter:tick(event)
+    movingControl:tick(event)
+    -- hunter:tick(event)
     tileMap:tick(event)
+    objControl:tick(event)
 end
 
 function scene:show( event )
@@ -52,8 +55,19 @@ function scene:show( event )
 
         tileMap:create(sceneGroup)
         objControl:create(tileMap.mapCont)
+        movingControl:init()
+
         hunter:create(tileMap.mapCont)
         tileMap:setHero(hunter)
+        objControl:setHero(hunter)
+        movingControl:add(hunter)
+
+        for i=1,4 do
+            local duck = Duck:new()
+            duck:create(tileMap.mapCont)
+            duck:move(math.random(100,300),math.random(100,300))
+            movingControl:add(duck)
+        end
 
 
         local function moveTouch(event)

@@ -12,6 +12,8 @@ local targetY = nil
 local distToTarget = nil
 local currentDistToTarget = nil
 local pauseMove = nil
+local name = nil
+
 
 function Hunter:create(group)
 	self.container = group
@@ -27,41 +29,34 @@ function Hunter:create(group)
 	self.distToTarget = 0
 	self.currentDistToTarget = 0
 	self.pauseMove = true
+	self.name = "hunter"
 end
 
 function Hunter:tick(event)
-	local coef = (event.time - self.lastTime) / display.fps
-	self.lastTime = event.time
-	if self.targetX == nil or self.targetY == nil then return end
-	if self.pauseMove == true then return end
+	-- local coef = (event.time - self.lastTime) / display.fps
+	-- self.lastTime = event.time
+	-- if self.targetX == nil or self.targetY == nil then return end
+	-- if self.pauseMove == true then return end
 	
 
-	self.currentDistToTarget = self:getDistance(self.targetX,self.targetY)
+	-- self.currentDistToTarget = self:getDistance(self.targetX,self.targetY)
 
-	self.distToTarget = self.distToTarget - math.abs(self.distToTarget - self.currentDistToTarget);
-    if (self.distToTarget <= 0) then
-		self:stopMoving()
-	end
+	-- self.distToTarget = self.distToTarget - math.abs(self.distToTarget - self.currentDistToTarget);
+ --    if (self.distToTarget <= 0) then
+	-- 	self:stopMoving()
+	-- end
 
-	local newX = self.view.x + self.vx * coef;
-	local newY = self.view.y + self.vy * coef;
+	-- local newX = self.view.x + self.vx * coef;
+	-- local newY = self.view.y + self.vy * coef;
 
-	self.view.x = newX
-	self.view.y = newY
+	-- self.view.x = newX
+	-- self.view.y = newY
 end
 
 function Hunter:stopMoving()
 	self.pauseMove = true
 	self.vx = 0
 	self.vy = 0
-end
-
-
-function Hunter:getDistance(x,y)
-	local dx = x - self.view.x
-	local dy = y - self.view.y
-	local delta = math.sqrt( dx*dx + dy*dy )
-	return delta
 end
 
 function Hunter:move(x,y)
@@ -79,7 +74,6 @@ function Hunter:move(x,y)
 	end
 
 	self.distToTarget = d
-
 end
 
 
