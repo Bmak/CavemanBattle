@@ -6,7 +6,7 @@ local view = nil
 local speed = nil
 local vx = nil
 local vy = nil
-local changeTime = nil
+local lastTime = nil
 local targetX = nil
 local targetY = nil
 local distToTarget = nil
@@ -20,41 +20,29 @@ function Hunter:create(sceneGroup)
 	self.view.y = display.contentCenterY
 
 	sceneGroup:insert(self.view)
-	self.speed = 100
+	self.speed = 10
 	self.vx = 0
 	self.vy = 0
-	self.changeTime = 0
+	self.lastTime = 0
 	self.distToTarget = 0
 	self.currentDistToTarget = 0
-	self.pauseMove = false
+	self.pauseMove = true
 end
 
 function Hunter:tick(event)
+	local coef = (event.time - self.lastTime) / display.fps
+	self.lastTime = event.time
 	if self.targetX == nil or self.targetY == nil then return end
 	if self.pauseMove == true then return end
+	
 
-
-	self.changeTime = event.time - self.changeTime
-	local coef = self.changeTime / 30 / 1000
-
-
-	local dx = self.targetX - self.view.x
-	local dy = self.targetY - self.view.y
-	local d = math.sqrt( dx*dx + dy*dy )
-
-	if (d ~= 0) then
-		self.vx = (dx / d) * self.speed;
-		self.vy = (dy / d) * self.speed;
-	end
-	self.currentDistToTarget = d
+	self.currentDistToTarget = self:getDistance(self.targetX,self.targetY)
 
 	self.distToTarget = self.distToTarget - math.abs(self.distToTarget - self.currentDistToTarget);
     if (self.distToTarget <= 0) then
 		self:stopMoving()
 	end
 
-
-	-- print (coef .. " delta time." )
 	local newX = self.view.x + self.vx * coef;
 	local newY = self.view.y + self.vy * coef;
 
@@ -82,7 +70,17 @@ function Hunter:move(x,y)
 	self.pauseMove = false
 	self.targetX = x
 	self.targetY = y
-	self.distToTarget = self:getDistance(x,y)
+	
+	local dx = self.targetX - self.view.x
+	local dy = self.targetY - self.view.y
+	local d = math.sqrt( dx*dx + dy*dy )
+
+	if (d ~= 0) then
+		self.vx = (dx / d) * self.speed;
+		self.vy = (dy / d) * self.speed;
+	end
+
+	self.distToTarget = d
 
 end
 
