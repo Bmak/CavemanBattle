@@ -17,11 +17,13 @@ function ObjectControl:setHero(obj)
 end
 
 function ObjectControl:initStones()
-	for i=1,20 do
+	for i=1,1 do
 		local stone = Stone:new()
 		stone:create(self.container)
-		stone.view.x = math.round(math.random(50, self.container.width-50))
-		stone.view.y = math.round(math.random(50, self.container.height-50))
+		-- stone.view.x = math.round(math.random(50, self.container.width-50))
+		-- stone.view.y = math.round(math.random(50, self.container.height-50))
+		stone.view.x = math.round(math.random(50, 250))
+		stone.view.y = math.round(math.random(50, 250))
 		table.insert( self.objects, stone )
 	end
 end
@@ -44,14 +46,14 @@ function ObjectControl:hasCollided( obj1, obj2 )
 end
 
 function ObjectControl:tick(event)
-	for k,obj in pairs(self.objects) do
-		if self:hasCollided(obj.view,self.hero.view) then
-			table.remove(self.objects,k)
-			obj.view:removeSelf( )
-			obj = nil
-			self.hero:addBullet(5)
-		end
-	end
+	-- for k,obj in pairs(self.objects) do
+	-- 	if self:hasCollided(obj.view,self.hero.view) then
+	-- 		table.remove(self.objects,k)
+	-- 		obj.view:removeSelf( )
+	-- 		obj = nil
+	-- 		self.hero:addBullet(5)
+	-- 	end
+	-- end
 end
 
 

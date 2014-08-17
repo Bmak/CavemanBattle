@@ -8,11 +8,13 @@ local sceneName = GameScene
 
 local composer = require( "composer" )
 local tileMap = require("app.map.TileMap")
-local hunter = require("app.obj.Hunter")
-local Duck = require("app.obj.Duck")
+local player = require("app.obj.Player")
+-- local Duck = require("app.obj.Duck")
 local objControl = require("app.ObjectControl")
 local movingControl = require("app.MovingControl")
 local barControl = require("app.BarControl")
+
+local hunter = nil
 
 -- Load scene with same root filename as this file
 local scene = composer.newScene( sceneName )
@@ -36,7 +38,6 @@ end
 
 function scene:worldTick( event )
     movingControl:tick(event)
-    -- hunter:tick(event)
     tileMap:tick(event)
     objControl:tick(event)
 end
@@ -58,7 +59,8 @@ function scene:show( event )
         objControl:create(tileMap.mapCont)
         movingControl:init(tileMap.mapCont)
 
-        hunter:create(tileMap.mapCont)
+        hunter = player:new()
+        hunter:create(tileMap.mapCont, "hero")
         tileMap:setHero(hunter)
         objControl:setHero(hunter)
         movingControl:addPlayer(hunter)
@@ -66,9 +68,9 @@ function scene:show( event )
         barControl:create(sceneGroup)
 
         for i=1,4 do
-            local duck = Duck:new()
-            duck:create(tileMap.mapCont)
-            duck:move(math.random(100,300),math.random(100,300))
+            local duck = player:new()
+            duck:create(tileMap.mapCont, "bot")
+            duck:randomMove()
             movingControl:addPlayer(duck)
         end
 

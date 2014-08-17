@@ -15,7 +15,8 @@ function Stone:new()
 		distToTarget = nil,
 		currentDistToTarget = nil,
 		pauseMove = nil,
-		name = nil
+		name = nil,
+		isDead = nil
 	}
 	self.__index = self
   	return setmetatable(params, self)
@@ -26,7 +27,7 @@ function Stone:create(group)
 	self.view = display.newImage("i/stone.png",0,0)
 	self.container:insert(self.view)
 
-	self.speed = 15
+	self.speed = 3
 	self.vx = 0
 	self.vy = 0
 	self.lastTime = 0
@@ -34,12 +35,11 @@ function Stone:create(group)
 	self.currentDistToTarget = 0
 	self.pauseMove = true
 	self.name = "bullet"
+	self.isDead = false
 end
 
 function Stone:tick(event)
-	if self.pauseMove then return end
-
-	
+	-- if self.pauseMove then return end
 end
 
 function Stone:stopMoving()
@@ -47,8 +47,10 @@ function Stone:stopMoving()
 	self.vx = 0
 	self.vy = 0
 
+	self.isDead = true
 	-- TODO removeStone
-	self.view:removeSelf( )
+	transition.to( self.view, {time=1000,alpha=0} )
+	-- self.view:removeSelf( )
 end
 
 function Stone:move(x,y)
