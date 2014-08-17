@@ -19,17 +19,15 @@ end
 function ObjectControl:initStones()
 	for i=1,20 do
 		local stone = Stone:new()
-		stone:create()
-		math.random( )
+		stone:create(self.container)
 		stone.view.x = math.round(math.random(50, self.container.width-50))
 		stone.view.y = math.round(math.random(50, self.container.height-50))
-		self.container:insert(stone.view)
 		table.insert( self.objects, stone )
 	end
 end
 
 --rectangle-based collision detection
-local function hasCollided( obj1, obj2 )
+function ObjectControl:hasCollided( obj1, obj2 )
    if ( obj1 == nil ) then  --make sure the first object exists
       return false
    end
@@ -46,14 +44,14 @@ local function hasCollided( obj1, obj2 )
 end
 
 function ObjectControl:tick(event)
-	-- for k,obj in pairs(self.objects) do
-	-- 	if hasCollided(obj.view,self.hero.view) then
-	-- 		-- print( "STONE HITTED" )
-	-- 		table.remove(self.objects,k)
-	-- 		obj.view:removeSelf( )
-	-- 		obj = nil
-	-- 	end
-	-- end
+	for k,obj in pairs(self.objects) do
+		if self:hasCollided(obj.view,self.hero.view) then
+			table.remove(self.objects,k)
+			obj.view:removeSelf( )
+			obj = nil
+			self.hero:addBullet(5)
+		end
+	end
 end
 
 

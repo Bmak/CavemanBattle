@@ -15,6 +15,7 @@ function Duck:new( ... )
 		distToTarget = nil,
 		currentDistToTarget = nil,
 		pauseMove = nil,
+		bulletsCount = nil,
 		name = nil
 	}
 	self.__index = self
@@ -25,7 +26,7 @@ end
 function Duck:create(group)
 	self.container = group
 	local id = math.round(math.random(2,4))
-	self.view = display.newImage("i/skin_2.png",0,0)
+	self.view = display.newImage("i/skin_"..id..".png",0,0)
 	self.view.xScale = 0.5
 	self.view.yScale = 0.5
 	self.view.x = display.contentCenterX
@@ -39,17 +40,38 @@ function Duck:create(group)
 	self.distToTarget = 0
 	self.currentDistToTarget = 0
 	self.pauseMove = true
-	self.name = "duck"..math.round(math.random()*4)
+	self.bulletsCount = 0
+	self.name = "enemy"
 end
 
-function Duck:tick( ... )
-	
+function Duck:tick(delta)
+	-- if self.bulletsCount > 0 then
+
+	-- end
+end
+
+function Duck:addBullet(value)
+	self.bulletsCount = self.bulletsCount + value
+end
+function Duck:removeBullet(value)
+	self.bulletsCount = self.bulletsCount - value
 end
 
 function Duck:stopMoving()
 	self.pauseMove = true
 	self.vx = 0
 	self.vy = 0
+end
+
+function Duck:kill()
+	self:stopMoving()
+	local x = self.view.x
+	local y = self.view.y
+	self.view:removeSelf( )
+	self.view = display.newImage("i/d_enemy.png",x,y)
+	self.view.xScale = 0.5
+	self.view.yScale = 0.5
+	self.container:insert(self.view)
 end
 
 function Duck:move(x,y)

@@ -12,6 +12,7 @@ local hunter = require("app.obj.Hunter")
 local Duck = require("app.obj.Duck")
 local objControl = require("app.ObjectControl")
 local movingControl = require("app.MovingControl")
+local barControl = require("app.BarControl")
 
 -- Load scene with same root filename as this file
 local scene = composer.newScene( sceneName )
@@ -55,18 +56,20 @@ function scene:show( event )
 
         tileMap:create(sceneGroup)
         objControl:create(tileMap.mapCont)
-        movingControl:init()
+        movingControl:init(tileMap.mapCont)
 
         hunter:create(tileMap.mapCont)
         tileMap:setHero(hunter)
         objControl:setHero(hunter)
-        movingControl:add(hunter)
+        movingControl:addPlayer(hunter)
+
+        barControl:create(sceneGroup)
 
         for i=1,4 do
             local duck = Duck:new()
             duck:create(tileMap.mapCont)
             duck:move(math.random(100,300),math.random(100,300))
-            movingControl:add(duck)
+            movingControl:addPlayer(duck)
         end
 
 

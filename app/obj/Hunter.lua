@@ -1,3 +1,6 @@
+local MovingControl = require("app.MovingControl")
+local BarControl = require("app.BarControl")
+
 local Hunter = {}
 
 local container = nil
@@ -15,6 +18,11 @@ local pauseMove = nil
 local name = nil
 
 
+local bulletsCount = nil
+local shootDelay = nil
+local currentDelay = nil
+
+
 function Hunter:create(group)
 	self.container = group
 	self.view = display.newImage("i/skin_1.png",0,0)
@@ -29,28 +37,31 @@ function Hunter:create(group)
 	self.distToTarget = 0
 	self.currentDistToTarget = 0
 	self.pauseMove = true
-	self.name = "hunter"
+	self.name = "hero"
+
+	self.bulletsCount = 0
+	self.shootDelay = 1000
+	self.currentDelay = 1000
 end
 
-function Hunter:tick(event)
-	-- local coef = (event.time - self.lastTime) / display.fps
-	-- self.lastTime = event.time
-	-- if self.targetX == nil or self.targetY == nil then return end
-	-- if self.pauseMove == true then return end
-	
+function Hunter:tick(delta)
+	self.currentDelay = self.currentDelay + delta
+	if self.bulletsCount > 0 and self.currentDelay >= self.shootDelay then
+		local target = MovingControl:getTarget(self)
+		if target ~= nil then
+			self.currentDelay = 0
+			MovingControl:shoot(self,target)
+		end
+	end
+end
 
-	-- self.currentDistToTarget = self:getDistance(self.targetX,self.targetY)
-
-	-- self.distToTarget = self.distToTarget - math.abs(self.distToTarget - self.currentDistToTarget);
- --    if (self.distToTarget <= 0) then
-	-- 	self:stopMoving()
-	-- end
-
-	-- local newX = self.view.x + self.vx * coef;
-	-- local newY = self.view.y + self.vy * coef;
-
-	-- self.view.x = newX
-	-- self.view.y = newY
+function Hunter:addBullet(value)
+	self.bulletsCount = self.bulletsCount + value
+	BarControl:setWeapCount(self.bulletsCount)
+end
+function Hunter:removeBullet(value)
+	self.bulletsCount = self.bulletsCount - value
+	BarControl:setWeapCount(self.bulletsCount)
 end
 
 function Hunter:stopMoving()
