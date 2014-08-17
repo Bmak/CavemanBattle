@@ -31,9 +31,9 @@ function MovingControl:tick(event)
 			obj.distToTarget = obj.distToTarget - math.abs(obj.distToTarget - currentDistToTarget);
 		    if (obj.distToTarget <= 0) then
 				obj:stopMoving()
-				if (obj.name == "bullet") then
-					self:removeBullet(bullet)
-				end
+			end
+			if obj.name == "bullet" and obj.isDead == true then
+				table.remove( self.allMovingObjects, table.indexOf( self.allMovingObjects, obj) )
 			end
 
 			if obj.pauseMove == false then
@@ -54,10 +54,10 @@ function MovingControl:checkHitBullet(bullet)
 	for k,obj in pairs(self.players) do
 		if bullet.parent ~= nil and bullet.parent ~= obj and obj.isDead == false then 
 			if ObjectControl:hasCollided( obj.view, bullet.view ) then
-				-- self:removeBullet(bullet)
-				-- self:removePlayer(obj)
+				self:removeBullet(bullet)
 				bullet:stopMoving()
-				obj:kill()
+				-- self:removePlayer(obj)
+				obj:kill(bullet)
 			end
 		end
 	end
@@ -69,7 +69,7 @@ function MovingControl:checkPickUpBullet(obj)
 			table.remove(ObjectControl.objects,k)
 			weapon.view:removeSelf( )
 			weapon = nil
-			obj:addBullet(111)
+			obj:addBullet(5)
 			return
 		end
 	end
@@ -99,7 +99,7 @@ end
 
 function MovingControl:removeBullet(obj)
 	table.remove( self.bullets, table.indexOf( self.bullets, obj) )
-	table.remove( self.allMovingObjects, table.indexOf( self.allMovingObjects, obj) )
+	-- table.remove( self.allMovingObjects, table.indexOf( self.allMovingObjects, obj) )
 end
 
 function MovingControl:getTarget(obj)

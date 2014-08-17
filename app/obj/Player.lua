@@ -143,8 +143,8 @@ function Player:stopMoving()
 	end
 end
 
-function Player:kill()
-	-- if self.name == "hero" then return end
+function Player:kill(bullet)
+	if self.name == "hero" then return end
 
 	self.isDead = true
 	self:stopMoving()
@@ -155,7 +155,7 @@ function Player:kill()
 	self.container:insert(self.view)
 	transition.to( self.view, {time=1000,alpha=0} )
 	
-	if self.name ~= "hero" then
+	if bullet.parent.name == "hero" then
 		local kills = bar:getKills() + 1
 		bar:setKills(kills)
 	end

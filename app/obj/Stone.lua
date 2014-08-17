@@ -27,7 +27,7 @@ function Stone:create(group)
 	self.view = display.newImage("i/stone.png",0,0)
 	self.container:insert(self.view)
 
-	self.speed = 3
+	self.speed = 15
 	self.vx = 0
 	self.vy = 0
 	self.lastTime = 0

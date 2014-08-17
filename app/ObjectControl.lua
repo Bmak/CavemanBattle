@@ -17,13 +17,13 @@ function ObjectControl:setHero(obj)
 end
 
 function ObjectControl:initStones()
-	for i=1,1 do
+	for i=1,15 do
 		local stone = Stone:new()
 		stone:create(self.container)
-		-- stone.view.x = math.round(math.random(50, self.container.width-50))
-		-- stone.view.y = math.round(math.random(50, self.container.height-50))
-		stone.view.x = math.round(math.random(50, 250))
-		stone.view.y = math.round(math.random(50, 250))
+		stone.view.x = math.round(math.random(50, self.container.width-50))
+		stone.view.y = math.round(math.random(50, self.container.height-50))
+		-- stone.view.x = math.round(math.random(50, 250))
+		-- stone.view.y = math.round(math.random(50, 250))
 		table.insert( self.objects, stone )
 	end
 end
