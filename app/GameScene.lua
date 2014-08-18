@@ -4,7 +4,7 @@
 --
 ---------------------------------------------------------------------------------
 
-local sceneName = GameScene
+local sceneName = "GameScene"
 
 local composer = require( "composer" )
 local tileMap = require("app.map.TileMap")
@@ -73,7 +73,7 @@ function scene:show( event )
             duck:randomMove()
             movingControl:addPlayer(duck)
         end
-        
+
 
         local function moveTouch(event)
         	self:onHunterMove(event)

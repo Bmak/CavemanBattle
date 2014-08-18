@@ -16,7 +16,8 @@ function Stone:new()
 		currentDistToTarget = nil,
 		pauseMove = nil,
 		name = nil,
-		isDead = nil
+		isDead = nil,
+		angle = nil
 	}
 	self.__index = self
   	return setmetatable(params, self)
@@ -36,10 +37,13 @@ function Stone:create(group)
 	self.pauseMove = true
 	self.name = "bullet"
 	self.isDead = false
+	self.angle = 0
 end
 
 function Stone:tick(event)
-	-- if self.pauseMove then return end
+	if self.pauseMove then return end
+
+	self.angle = self.angle + 5
 end
 
 function Stone:stopMoving()
@@ -63,8 +67,8 @@ function Stone:move(x,y)
 	local d = math.sqrt( dx*dx + dy*dy )
 
 	if (d ~= 0) then
-		self.vx = (dx / d) * self.speed;
-		self.vy = (dy / d) * self.speed;
+		self.vx = (dx / d) * self.speed
+		self.vy = (dy / d) * self.speed
 	end
 
 	self.distToTarget = d

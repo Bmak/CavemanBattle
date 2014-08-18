@@ -62,7 +62,7 @@ end
 function TileMap:tick(event)
 	local coef = (event.time - self.lastTime) / display.fps
 	self.lastTime = event.time
-	if self.hero.vx == 0 and self.hero.vy == 0 then return end
+	-- if self.hero.vx == 0 and self.hero.vy == 0 and self.hero.isDead == false then return end
 
 	local lookAtX = 0
 	local lookAtY = 0

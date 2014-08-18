@@ -8,6 +8,7 @@ local allMovingObjects = nil
 local lastTime = nil
 local Stone = require("app.obj.Stone")
 local ObjectControl = require("app.ObjectControl")
+local F = require("app.F")
 
 
 function MovingControl:init(group)
@@ -26,7 +27,7 @@ function MovingControl:tick(event)
 	self.lastTime = event.time
 	for i,obj in pairs(self.allMovingObjects) do
 		if (obj.targetY ~= nil or obj.targetY ~= nil) and obj.pauseMove == false then
-			local currentDistToTarget = self:getDistance(obj,obj.targetX,obj.targetY)
+			local currentDistToTarget = F:getDistance(obj,obj.targetX,obj.targetY)
 
 			obj.distToTarget = obj.distToTarget - math.abs(obj.distToTarget - currentDistToTarget);
 		    if (obj.distToTarget <= 0) then
@@ -52,8 +53,8 @@ end
 
 function MovingControl:checkHitBullet(bullet)
 	for k,obj in pairs(self.players) do
-		if bullet.parent ~= nil and bullet.parent ~= obj and obj.isDead == false then 
-			if ObjectControl:hasCollided( obj.view, bullet.view ) then
+		if bullet.parent ~= nil and bullet.parent ~= obj and obj.isDead == false and obj.view.alpha == 1 then 
+			if F:hasCollided( obj.view, bullet.view ) then
 				self:removeBullet(bullet)
 				bullet:stopMoving()
 				-- self:removePlayer(obj)
@@ -64,8 +65,10 @@ function MovingControl:checkHitBullet(bullet)
 end
 
 function MovingControl:checkPickUpBullet(obj)
+	if obj.bulletsCount >= obj.maxBullets then return end
+
 	for k,weapon in pairs(ObjectControl.objects) do
-		if ObjectControl:hasCollided(obj.view,weapon.view) then
+		if F:hasCollided(obj.view,weapon.view) then
 			table.remove(ObjectControl.objects,k)
 			weapon.view:removeSelf( )
 			weapon = nil
@@ -73,13 +76,6 @@ function MovingControl:checkPickUpBullet(obj)
 			return
 		end
 	end
-end
-
-function MovingControl:getDistance(obj,x,y)
-	local dx = x - obj.view.x
-	local dy = y - obj.view.y
-	local delta = math.sqrt( dx*dx + dy*dy )
-	return delta
 end
 
 function MovingControl:addPlayer(obj)
@@ -107,7 +103,7 @@ function MovingControl:getTarget(obj)
 	local currentVictim = nil
 	for k,victim in pairs(self.players) do
 		if victim ~= obj and victim.isDead == false then
-			local dist = self:getDistance(victim,obj.view.x,obj.view.y)
+			local dist = F:getDistance(victim,obj.view.x,obj.view.y)
 			if minDist == nil or minDist > dist then
 				minDist = dist
 				currentVictim = victim

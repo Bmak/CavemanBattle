@@ -3,6 +3,8 @@ local Player = {}
 
 local bar = require("app.BarControl")
 local MovingControl = require("app.MovingControl")
+local ObjectControl = require("app.ObjectControl")
+local F = require("app.F")
 
 
 function Player:new( ... )
@@ -25,25 +27,34 @@ function Player:new( ... )
 		tap = nil,
 		R_Time = nil,
 		C_Time = nil,
-		isDead = nil
+		isDead = nil,
+		maxBullets = nil
 	}
 	self.__index = self
   	return setmetatable(params, self)
 end
 
 
+local function getSkin(stype)
+	local skin = nil
+	if stype == "hero" then
+		skin = "i/skin_1.png"
+	else
+		local id = math.round(math.random(2,4))
+		skin = "i/mskin_"..id..".png"
+	end
+	return skin
+end
+
 function Player:create(group, type)
 	self.container = group
-	local id = math.round(math.random(2,4))
-	local skin = "i/mskin_"..id..".png"
-	if type == "hero" then
-		skin = "i/skin_1.png"
-	end
-	self.view = display.newImage(skin,0,0)
-	self.view.x = display.contentCenterX
-	self.view.y = display.contentCenterY
+	self.name = type
+	
+	
+	-- self.view = display.newImage(tostring(getSkin(type)),0,0)
+	-- self.view.x = display.contentCenterX
+	-- self.view.y = display.contentCenterY
 
-	self.container:insert(self.view)
 	self.speed = 10
 	self.vx = 0
 	self.vy = 0
@@ -52,6 +63,7 @@ function Player:create(group, type)
 	self.currentDistToTarget = 0
 	self.pauseMove = true
 
+	self.maxBullets = 20
 	self.bulletsCount = 0
 	self.shootDelay = 1000
 	self.currentDelay = 1000
@@ -61,7 +73,7 @@ function Player:create(group, type)
 	self.C_Time = 2500
 	self.isDead = false
 
-	self.name = type
+	self:respawn()
 
 	local function killTouch(event)
 		return true
@@ -69,29 +81,11 @@ function Player:create(group, type)
 	self.view:addEventListener( "touch", killTouch )
 end
 
-local function checkForResp(self, delta )
-	if self.isDead == true then
-		self.C_Time = self.C_Time - delta
-		if self.C_Time <= 0 then
-			self.C_Time = self.R_Time
-			self.isDead = false
-			transition.cancel(self.view)
-			self.view:removeSelf( )
-			local id = math.round(math.random(2,4))
-			local skin = "i/mskin_"..id..".png"
-			self.view = display.newImage(skin,x,y)
-			self.view.alpha = 1
-			self.container:insert(self.view)
-
-			if self.name == "bot" then
-				self:initBotStrategy()
-			end
-		end
-	end
-end
-
 function Player:tick(delta)
-	checkForResp(self,delta)
+	if self.isDead == true then 
+		self:checkForResp(delta)
+		return
+	end
 
 	self.currentDelay = self.currentDelay + delta
 	if self.bulletsCount > 0 and self.currentDelay >= self.shootDelay and self.isDead == false then
@@ -105,19 +99,75 @@ function Player:tick(delta)
 	end
 end
 
-function Player:initBotStrategy()
+function Player:checkForResp(delta)
+	self.C_Time = self.C_Time - delta
+	if self.C_Time <= 0 then
+		self.C_Time = self.R_Time
+		self:respawn()
+	end
+end
+
+function Player:respawn()
+	self.isDead = false
+	if self.view ~= nil then
+		transition.cancel(self.view)
+		self.view:removeSelf( )
+	end
+	
+	self.view = display.newImage(tostring(getSkin(self.name)),x,y)
+	self.view.alpha = 0.1
+	transition.to( self.view, {time=1000, alpha=1} )
+	-- local function complete( ... )
+		-- transition.cancel(self.view)
+	-- end
+	-- transition.blink( self.view, { time=1000, onComplete=complete() } )
+	self.container:insert(self.view)
+
 	local maxX = self.container.width - 100
 	local maxY = self.container.height - 100
 	self.view.x = math.random(150,maxX)
 	self.view.y = math.random(150,maxY)
 
-	self:randomMove()
+	if self.name == "hero" then 
+		--TODO focus for hero
+		-- print( "FOCUS ON ME" )
+	elseif self.name == "bot" then
+		self:smartBotStrategy()
+	end
+	
+end
+
+function Player:smartBotStrategy()
+	if self.bulletsCount < 5 then
+		local wep = self:findWeapon()
+		if wep ~= nil then
+			self:move(wep.view.x,wep.view.y)
+		else 
+			self:randomMove()
+		end
+	else
+		self:randomMove()
+	end
 end
 
 function Player:randomMove()
 	local maxX = self.container.width - 100
 	local maxY = self.container.height - 100
 	self:move(math.random(100,maxX),math.random(100,maxY))
+end
+
+function Player:findWeapon()
+	local minDist = nil
+	local currentWeapon = nil
+	local weapons = ObjectControl.objects
+	for k,wep in pairs(weapons) do
+		local d = F:getDistance(wep,self.view.x,self.view.y)
+		if minDist == nil or minDist > d then
+			minDist = d
+			currentWeapon = wep
+		end
+	end
+	return currentWeapon
 end
 
 function Player:addBullet(value)
@@ -139,7 +189,7 @@ function Player:stopMoving()
 	self.vy = 0
 
 	if self.name == "bot" and self.isDead == false then
-		self:randomMove()
+		self:smartBotStrategy()
 	end
 
 	if self.tap ~= nil then
@@ -149,7 +199,7 @@ function Player:stopMoving()
 end
 
 function Player:kill(bullet)
-	if self.name == "hero" then return end
+	-- if self.name == "hero" then return end
 
 	self.isDead = true
 	self:stopMoving()
@@ -158,7 +208,7 @@ function Player:kill(bullet)
 	self.view:removeSelf( )
 	self.view = display.newImage("i/md_enemy.png",x,y)
 	self.container:insert(self.view)
-	transition.to( self.view, {time=1000,alpha=0} )
+	transition.to( self.view, {time=1000,alpha=0.1} )
 	
 	if bullet.parent.name == "hero" then
 		local kills = bar:getKills() + 1
@@ -167,6 +217,8 @@ function Player:kill(bullet)
 end
 
 function Player:move(x,y)
+	if self.isDead == true then return end
+
 	if self.name == "hero" then
 		if self.tap ~= nil then
 			self.tap:removeSelf()

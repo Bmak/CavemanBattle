@@ -49,6 +49,12 @@ local function createKillsBar(self)
 end
 
 function BarControl:setWeapCount(value)
+	if tonumber(self.weaponTxt.text) < value then
+		transition.cancel(self.weaponView)
+		self.weaponView.xScale = 0.8
+		self.weaponView.yScale = 0.8
+		transition.to( self.weaponView, {time=500,xScale=1,yScale=1,transition=easing.inOutBack} )
+	end
 	self.weaponTxt.text = value
 end
 
@@ -59,6 +65,10 @@ end
 function BarControl:setKills(value)
 	self.killsCount = value
 	self.killsTxt.text = self.killsCount
+	transition.cancel(self.killsView)
+	self.killsView.xScale = 0.8
+	self.killsView.yScale = 0.8
+	transition.to( self.killsView, {time=500,xScale=1.3,yScale=1.3,transition=easing.inOutBack} )
 end
 
 function BarControl:create(group)

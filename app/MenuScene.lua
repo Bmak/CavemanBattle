@@ -7,6 +7,11 @@
 local sceneName = "MenuScene"
 
 local composer = require( "composer" )
+local bezier = require("app.bezier")
+local stone = require("app.obj.Stone")
+local socket = require("socket")
+
+require("app.noobhub")
 
 -- Load scene with same root filename as this file
 local scene = composer.newScene( sceneName )
@@ -22,6 +27,55 @@ function scene:create( event )
    	bkg.x = display.contentCenterX
    	bkg.y = display.contentCenterY
     sceneGroup:insert( bkg )
+
+    -- hub = noobhub.new({ server = "http://get-id.ru/websocket"; port = 8080; });
+
+    -- -- local client = socket.connect( "www.apple.com", 80 )
+    -- local client = socket.connect( "http://get-id.ru/websocket", 80 )
+    -- local client = socket.connect( "get-id.ru", 8080 )
+    
+    
+    -- Get IP and port from client
+    -- local ip, port = client:getsockname()
+
+    -- -- Print the IP address and port to the terminal
+    -- print( "IP Address:", ip )
+    -- print( "Port:", port )
+
+    -- function networkListener( event )
+    --     print( "address", event.address )
+    --     print( "isReachable", event.isReachable )
+    --     print( "isConnectionRequired", event.isConnectionRequired )
+    --     print( "isConnectionOnDemand", event.isConnectionOnDemand )
+    --     print( "IsInteractionRequired", event.isInteractionRequired )
+    --     print( "IsReachableViaCellular", event.isReachableViaCellular )
+    --     print( "IsReachableViaWiFi", event.isReachableViaWiFi )
+    --     -- If you want to remove the listener, call network.setStatusListener( "www.apple.com", nil ) 
+    -- end
+
+    -- if ( network.canDetectNetworkStatusChanges ) then
+    --     network.setStatusListener( "get-id.ru", networkListener )
+    -- else
+    --     print( "Network reachability not supported on this platform." )
+    -- end
+
+    -- local st = stone:new()
+    -- st:create(sceneGroup)
+    -- st.view.x = 100
+    -- st.view.y = 100
+    -- local curve = bezier:curve({100, 200, 300}, {100, 200, 100})
+
+    -- local i = 0.01
+    -- local function onTick( ... )
+    --     local x, y = curve(i)
+    --     i = i + 0.01
+    --     st.view.x = x
+    --     st.view.y = y
+    --     if i >= 1 then
+    --         i = 0.01
+    --     end
+    -- end
+    -- Runtime:addEventListener( "enterFrame", onTick )
 
 
     -- Called when the scene's view does not exist
