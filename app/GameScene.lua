@@ -73,7 +73,7 @@ function scene:show( event )
             duck:randomMove()
             movingControl:addPlayer(duck)
         end
-
+        
 
         local function moveTouch(event)
         	self:onHunterMove(event)
@@ -103,6 +103,9 @@ end
 
 function scene:destroy( event )
     local sceneGroup = self.view
+
+    tileMap.mapCont:removeEventListener( "touch", moveTouch )
+    Runtime:removeEventListener( "enterFrame", onTick )
 
     -- Called prior to the removal of scene's "view" (sceneGroup)
     -- 

@@ -128,4 +128,8 @@ function MovingControl:shoot(fromObj,toObj)
 	bullet.parent = fromObj
 end
 
+function MovingControl:destroy( ... )
+	-- body
+end
+
 return MovingControl

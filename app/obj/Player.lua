@@ -62,6 +62,11 @@ function Player:create(group, type)
 	self.isDead = false
 
 	self.name = type
+
+	local function killTouch(event)
+		return true
+	end
+	self.view:addEventListener( "touch", killTouch )
 end
 
 local function checkForResp(self, delta )
@@ -188,7 +193,7 @@ function Player:move(x,y)
 	self.distToTarget = d
 end
 
-function Player:clearData()
+function Player:destroy()
 	-- body
 end
 

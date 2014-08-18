@@ -23,7 +23,7 @@ function TileMap:create(group)
 		table.insert( mapData, mtrx )
 	end
 
-	self:createByMap(mapData,9,6)
+	self:createByMap(mapData,9,9)
 
 end
 
@@ -48,22 +48,7 @@ function TileMap:setHero(obj)
 	self.hero = obj
 end
 
-function TileMap:tick(event)
-	local coef = (event.time - self.lastTime) / display.fps
-	self.lastTime = event.time
-	if self.hero.vx == 0 and self.hero.vy == 0 then return end
-
-	local dx, dy = self.hero.view:localToContent(0, 0)
-	-- print(dx,dy)
-	-- if math.round(dx) < display.pixelHeight/2 + 10 and math.round(dx) > display.pixelHeight/2 - 10 then 
-		self.mapCont.x = self.mapCont.x - self.hero.vx*coef
-		-- print("CHANGE X")
-	-- end
-	-- if math.round(dy) < display.pixelWidth/2 + 10 and math.round(dy) > display.pixelWidth/2 - 10 then 
-		self.mapCont.y = self.mapCont.y - self.hero.vy*coef
-		-- print("CHANGE Y")
-	-- end
-
+local function checkEndMap(self)
 	if self.mapCont.x < display.pixelHeight - self.mapCont.width then
 	 	self.mapCont.x = display.pixelHeight - self.mapCont.width
 	end
@@ -72,8 +57,41 @@ function TileMap:tick(event)
 	if self.mapCont.y < display.pixelWidth - self.mapCont.height then 
 		self.mapCont.y = display.pixelWidth - self.mapCont.height
 	end
-
 end
+
+function TileMap:tick(event)
+	local coef = (event.time - self.lastTime) / display.fps
+	self.lastTime = event.time
+	if self.hero.vx == 0 and self.hero.vy == 0 then return end
+
+	local lookAtX = 0
+	local lookAtY = 0
+	-- local a_x, a_y = self.hero.view:localToContent(0, 0)
+	local a_x = self.hero.view.x
+	local a_y = self.hero.view.y
+	if a_x < display.pixelHeight/2 then
+		lookAtX = 0
+	elseif a_x > self.mapCont.width - display.pixelHeight/2 then
+		lookAtX = self.mapCont.width - display.pixelHeight
+	else
+		lookAtX = -display.pixelHeight/2 + a_x
+	end
+
+	if a_y < display.pixelWidth/2 then
+		lookAtY = 0
+	elseif a_y > self.mapCont.height - display.pixelWidth/2 then
+		lookAtY = self.mapCont.height - display.pixelWidth
+	else
+		lookAtY = -display.pixelWidth/2 + a_y
+	end
+
+	self.mapCont.x = -lookAtX
+	self.mapCont.y = -lookAtY
+
+	checkEndMap(self)
+end
+
+
 
 
 

@@ -5,8 +5,16 @@ local container = nil
 local objects = nil
 local hero = nil
 
+local addObjectTimer = nil
+local currentAddObjectTime = nil
+local lastTime = nil
+
 function ObjectControl:create(group)
 	self.container = group
+
+	self.addObjectTimer = 4000
+	self.currentAddObjectTime = 4000
+	self.lastTime = 0
 
 	self.objects = {}
 	self:initStones()
@@ -18,14 +26,19 @@ end
 
 function ObjectControl:initStones()
 	for i=1,15 do
-		local stone = Stone:new()
-		stone:create(self.container)
-		stone.view.x = math.round(math.random(50, self.container.width-50))
-		stone.view.y = math.round(math.random(50, self.container.height-50))
-		-- stone.view.x = math.round(math.random(50, 250))
-		-- stone.view.y = math.round(math.random(50, 250))
-		table.insert( self.objects, stone )
+		self:addObject()
 	end
+end
+
+function ObjectControl:addObject()
+	local stone = Stone:new()
+	stone:create(self.container)
+	stone.view.x = math.round(math.random(50, self.container.width-50))
+	stone.view.y = math.round(math.random(50, self.container.height-50))
+	stone.view.xScale = 0.1
+	stone.view.yScale = 0.1
+	transition.to( stone.view, {time=500,xScale=1.5,yScale=1.5,transition=easing.inOutBack} )
+	table.insert( self.objects, stone )
 end
 
 --rectangle-based collision detection
@@ -46,16 +59,21 @@ function ObjectControl:hasCollided( obj1, obj2 )
 end
 
 function ObjectControl:tick(event)
-	-- for k,obj in pairs(self.objects) do
-	-- 	if self:hasCollided(obj.view,self.hero.view) then
-	-- 		table.remove(self.objects,k)
-	-- 		obj.view:removeSelf( )
-	-- 		obj = nil
-	-- 		self.hero:addBullet(5)
-	-- 	end
-	-- end
+	if table.maxn( self.objects ) >= 30 then return end
+
+	if self.lastTime == 0 then self.lastTime = event.time end
+	local delta = event.time - self.lastTime
+	self.lastTime = event.time
+
+	self.currentAddObjectTime = self.currentAddObjectTime - delta
+	if self.currentAddObjectTime <= 0 then
+		self:addObject()
+		self.currentAddObjectTime = self.addObjectTimer
+	end
 end
 
-
+function ObjectControl:destroy()
+	-- body
+end
 
 return ObjectControl
