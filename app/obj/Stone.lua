@@ -53,8 +53,10 @@ function Stone:stopMoving()
 
 	self.isDead = true
 	-- TODO removeStone
-	transition.to( self.view, {time=1000,alpha=0} )
-	-- self.view:removeSelf( )
+	local function complete( ... )
+		self.view:removeSelf( )
+	end
+	transition.to( self.view, {time=1000,alpha=0,onComplete=complete()} )
 end
 
 function Stone:move(x,y)
@@ -72,6 +74,14 @@ function Stone:move(x,y)
 	end
 
 	self.distToTarget = d
+end
+
+function Stone:destroy( ... )
+	if self.view then
+		self.view:removeSelf( )
+	end
+	self.view = nil
+	self.container = nil
 end
 
 

@@ -46,7 +46,7 @@ noobhub = {
 			self.sock:setoption( 'tcp-nodelay', true ) -- disable Nagle's algorithm for the connection
 			self.sock:settimeout(0)
 			local input,output = socket.select(nil,{ self.sock }, 3)
-			for i,v in ipairs(output) do  v:send("__SUBSCRIBE__"..self.channel.."__ENDSUBSCRIBE__"); end
+			-- for i,v in ipairs(output) do  v:send("__SUBSCRIBE__"..self.channel.."__ENDSUBSCRIBE__"); end
 			return true
 		end
 
@@ -64,7 +64,7 @@ noobhub = {
 			self.sock:setoption( 'tcp-nodelay', true ) -- disable Nagle's algorithm for the connection
 			self.sock:settimeout(0)
 			local input,output = socket.select(nil,{ self.sock }, 3)
-			for i,v in ipairs(output) do  v:send("__JSON__START__"..self.channel.."__JSON__END__"); end
+			-- for i,v in ipairs(output) do  v:send("__JSON__START__"..self.channel.."__JSON__END__"); end
 			return true
 		end
 
@@ -89,7 +89,8 @@ noobhub = {
 					self:reconnect()
 					return false;
 				end
-				local send_result, message, num_bytes = self.sock:send("__JSON__START__"..json.encode(message.message).."__JSON__END__")
+				-- local send_result, message, num_bytes = self.sock:send("__JSON__START__"..json.encode(message.message).."__JSON__END__")
+				local send_result, message, num_bytes = self.sock:send(json.encode(message))
 				if (send_result == nil) then
 					print("Noobhub publish error: "..message..'  sent '..num_bytes..' bytes');
 					if (message == 'closed') then  self:reconnect() end
@@ -106,7 +107,8 @@ noobhub = {
 					return false;
 				end
 				message.action = 'move';
-				local send_result, message, num_bytes = self.sock:send("__JSON__START__"..json.encode(message).."__JSON__END__")
+				-- local send_result, message, num_bytes = self.sock:send("__JSON__START__"..json.encode(message).."__JSON__END__")
+				local send_result, message, num_bytes = self.sock:send(json.encode(message))
 				if (send_result == nil) then
 					print("Noobhub publish error: "..message..'  sent '..num_bytes..' bytes');
 					if (message == 'closed') then  self:reconnect() end
@@ -129,20 +131,28 @@ noobhub = {
 						if (e) then break; end
 					end -- /while-do
 
-
-					-- now, checking if a message is present in buffer...
-					while got_something_new do  --  this is for a case of several messages stocker in the buffer
-							local start = string.find(self.buffer,'__JSON__START__')
-							local finish = string.find(self.buffer,'__JSON__END__')
-							if (start and finish) then -- found a message!
-								local message = string.sub(self.buffer, start+15, finish-1)
-								self.buffer = string.sub(self.buffer, 1, start-1)  ..   string.sub(self.buffer, finish + 13 ) -- cutting our message from buffer
-								local data = json.decode(message)
-								self.callback(  data  )
-							else
-								break
-							end
+					-- local i = 0
+					while got_something_new do 
+						local message = tostring(self.buffer)
+						local data = json.decode(message)
+						self.callback(  data  )
+						-- i = i + 1
+						-- if (i == 2) then break end
+						break
 					end -- /while-do
+					-- now, checking if a message is present in buffer...
+					-- while got_something_new do  --  this is for a case of several messages stocker in the buffer
+					-- 		local start = string.find(self.buffer,'__JSON__START__')
+					-- 		local finish = string.find(self.buffer,'__JSON__END__')
+					-- 		if (start and finish) then -- found a message!
+					-- 			local message = string.sub(self.buffer, start+15, finish-1)
+					-- 			self.buffer = string.sub(self.buffer, 1, start-1)  ..   string.sub(self.buffer, finish + 13 ) -- cutting our message from buffer
+					-- 			local data = json.decode(message)
+					-- 			-- self.callback(  data  )
+					-- 		else
+					-- 			break
+					-- 		end
+					-- end -- /while-do
 
 				end -- / for-do
 				

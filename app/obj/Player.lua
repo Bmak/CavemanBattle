@@ -5,10 +5,13 @@ local bar = require("app.BarControl")
 local MovingControl = require("app.MovingControl")
 local ObjectControl = require("app.ObjectControl")
 local F = require("app.F")
+local SC = require("app.SocketControl")
+
 
 
 function Player:new( ... )
 	local params = {
+		id = nil,
 		container = nil,
 		view = nil,
 		speed = nil,
@@ -46,10 +49,10 @@ local function getSkin(stype)
 	return skin
 end
 
-function Player:create(group, type)
+function Player:create(group, type, id)
 	self.container = group
 	self.name = type
-	
+	self.id = id
 	
 	-- self.view = display.newImage(tostring(getSkin(type)),0,0)
 	-- self.view.x = display.contentCenterX
@@ -74,29 +77,36 @@ function Player:create(group, type)
 	self.isDead = false
 
 	self:respawn()
-
-	local function killTouch(event)
-		return true
-	end
-	self.view:addEventListener( "touch", killTouch )
 end
 
 function Player:tick(delta)
-	if self.isDead == true then 
+	if self.isDead == true and self.name ~= "player" then 
 		self:checkForResp(delta)
 		return
 	end
 
+	if self.name == "player" then
+		return
+	end
+
+
 	self.currentDelay = self.currentDelay + delta
-	if self.bulletsCount > 0 and self.currentDelay >= self.shootDelay and self.isDead == false then
+	if self.bulletsCount > 0 and self.currentDelay >= self.shootDelay and self.isDead == false and self.view.alpha == 1 then
 		local target = MovingControl:getTarget(self)
 		if target ~= nil then
 			local x,y = target.view:localToContent( 0, 0 )
 			if x < 0 or y < 0 then return end
 			self.currentDelay = 0
-			MovingControl:shoot(self,target)
+			-- MovingControl:shoot(self.view.x,self.view.y,target.view.x,target.view.y)
+			self:throw(target.view.x,target.view.y)
+			SC:throw(target.view.x,target.view.y)
 		end
 	end
+end
+
+function Player:throw(x,y)
+	MovingControl:shoot(self,x,y)
+	self:removeBullet(1)
 end
 
 function Player:checkForResp(delta)
@@ -107,7 +117,7 @@ function Player:checkForResp(delta)
 	end
 end
 
-function Player:respawn()
+function Player:respawn(x,y)
 	self.isDead = false
 	if self.view ~= nil then
 		transition.cancel(self.view)
@@ -116,25 +126,32 @@ function Player:respawn()
 	
 	self.view = display.newImage(tostring(getSkin(self.name)),x,y)
 	self.view.alpha = 0.1
-	transition.to( self.view, {time=1000, alpha=1} )
+	transition.to( self.view, {time=2000, alpha=1} )
 	-- local function complete( ... )
 		-- transition.cancel(self.view)
 	-- end
 	-- transition.blink( self.view, { time=1000, onComplete=complete() } )
 	self.container:insert(self.view)
+	local function killTouch(event)
+		return true
+	end
+	self.view:addEventListener( "touch", killTouch )
 
-	local maxX = self.container.width - 100
-	local maxY = self.container.height - 100
-	self.view.x = math.random(150,maxX)
-	self.view.y = math.random(150,maxY)
+	if self.name == "player" and x ~= nil and y ~= nil then
+		self.view.x = x
+		self.view.y = y
+	else
+		local maxX = self.container.width - 100
+		local maxY = self.container.height - 100
+		self.view.x = math.random(150,maxX)
+		self.view.y = math.random(150,maxY)
+	end
 
-	if self.name == "hero" then 
-		--TODO focus for hero
-		-- print( "FOCUS ON ME" )
+	if self.name == "hero" then
+		SC:reborn(self.view.x,self.view.y)
 	elseif self.name == "bot" then
 		self:smartBotStrategy()
 	end
-	
 end
 
 function Player:smartBotStrategy()
@@ -200,24 +217,38 @@ end
 
 function Player:kill(bullet)
 	-- if self.name == "hero" then return end
+	
+	if self.isDead == false then
+		self:dead()
+	end
 
+	local kills = 0
+	if bullet.parent.name == "hero" then
+		kills = bar:getKills() + 1
+		bar:setKills(kills)
+	elseif self.name == "hero" then
+		kills = bar:getKills() - 1
+		bar:setKills(kills)
+		SC:dead()
+	end
+end
+
+function Player:dead()
 	self.isDead = true
 	self:stopMoving()
 	local x = self.view.x
 	local y = self.view.y
 	self.view:removeSelf( )
-	self.view = display.newImage("i/md_enemy.png",x,y)
+	self.view = display.newImage("i/dead.png",x,y)
 	self.container:insert(self.view)
+	transition.to( self.view, {delay=100,time=300,y=self.view.y+50} )
 	transition.to( self.view, {time=1000,alpha=0.1} )
-	
-	if bullet.parent.name == "hero" then
-		local kills = bar:getKills() + 1
-		bar:setKills(kills)
-	end
 end
 
 function Player:move(x,y)
 	if self.isDead == true then return end
+
+	SC:move(x,y)
 
 	if self.name == "hero" then
 		if self.tap ~= nil then
@@ -226,7 +257,7 @@ function Player:move(x,y)
 		self.tap = display.newImage("i/tap.png",x,y)
 		self.tap.alpha = 0.7
 		self.container:insert(self.tap)
-		self.view:toFront( )
+		self.view:toFront()
 	end
 
 	self.pauseMove = false
@@ -246,7 +277,11 @@ function Player:move(x,y)
 end
 
 function Player:destroy()
-	-- body
+	if self.view then
+		self.view:removeSelf( )
+	end
+	self.view = nil
+	self.container = nil
 end
 
 return Player

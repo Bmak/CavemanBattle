@@ -4,8 +4,6 @@
 --
 ---------------------------------------------------------------------------------
 
-local sceneName = "GameScene"
-
 local composer = require( "composer" )
 local tileMap = require("app.map.TileMap")
 local player = require("app.obj.Player")
@@ -13,21 +11,72 @@ local player = require("app.obj.Player")
 local objControl = require("app.ObjectControl")
 local movingControl = require("app.MovingControl")
 local barControl = require("app.BarControl")
+local SC = require("app.SocketControl")
 
 local hunter = nil
 
 -- Load scene with same root filename as this file
-local scene = composer.newScene( sceneName )
+local scene = composer.newScene(  )
 
 ---------------------------------------------------------------------------------
 
 function scene:create( event )
     local sceneGroup = self.view
+    
+
+    local uniq_id = system.getInfo('deviceID')
+    print("ID "..uniq_id)
+
+    print("TRY TO CONNECT")
+
+    SC:connect()
+
+
+    local function addP(e)
+        print("ADD NEW PLAYER "..e.id)
+        local pl = player:new()
+        pl:create(tileMap.mapCont, "player", e.id)
+        movingControl:addPlayer(pl)
+        SC.listener:removeEventListener( "addNewPlayer", addP )
+        SC:reborn(hunter.view.x,hunter.view.y)
+        SC:move(hunter.targetX, hunter.targetY)
+    end
+    SC.listener:addEventListener( "addNewPlayer", addP )
 
     -- Called when the scene's view does not exist
     -- 
     -- INSERT code here to initialize the scene
     -- e.g. add display objects to 'sceneGroup', add touch listeners, etc
+    print( "CREATE SCENE" )
+
+    tileMap:create(sceneGroup)
+    objControl:create(tileMap.mapCont)
+    movingControl:init(tileMap.mapCont)
+
+    hunter = player:new()
+    hunter:create(tileMap.mapCont, "hero", system.getInfo('deviceID'))
+    tileMap:setHero(hunter)
+    objControl:setHero(hunter)
+    movingControl:addPlayer(hunter)
+
+    barControl:create(sceneGroup)
+
+    -- for i=1,4 do
+    --     local duck = player:new()
+    --     duck:create(tileMap.mapCont, "bot")
+    --     duck:randomMove()
+    --     movingControl:addPlayer(duck)
+    -- end
+
+
+    local function moveTouch(event)
+        self:onHunterMove(event)
+    end
+    local function onTick(event)
+        self:worldTick(event)
+    end
+    tileMap.mapCont:addEventListener( "touch", moveTouch )
+    Runtime:addEventListener( "enterFrame", onTick )
 end
 
 function scene:onHunterMove(event)
@@ -53,36 +102,10 @@ function scene:show( event )
         -- 
         -- INSERT code here to make the scene come alive
         -- e.g. start timers, begin animation, play audio, etc
+        print( "SHOW SCENE" )
 
 
-        tileMap:create(sceneGroup)
-        objControl:create(tileMap.mapCont)
-        movingControl:init(tileMap.mapCont)
-
-        hunter = player:new()
-        hunter:create(tileMap.mapCont, "hero")
-        tileMap:setHero(hunter)
-        objControl:setHero(hunter)
-        movingControl:addPlayer(hunter)
-
-        barControl:create(sceneGroup)
-
-        for i=1,4 do
-            local duck = player:new()
-            duck:create(tileMap.mapCont, "bot")
-            duck:randomMove()
-            movingControl:addPlayer(duck)
-        end
-
-
-        local function moveTouch(event)
-        	self:onHunterMove(event)
-        end
-        local function onTick(event)
-        	self:worldTick(event)
-        end
-        tileMap.mapCont:addEventListener( "touch", moveTouch )
-      	Runtime:addEventListener( "enterFrame", onTick )
+        
     end 
 end
 
@@ -97,6 +120,12 @@ function scene:hide( event )
         -- e.g. stop timers, stop animation, unload sounds, etc.)
     elseif phase == "did" then
         -- Called when the scene is now off screen
+
+        print( "HIDE SCENE" )
+
+        tileMap.mapCont:removeEventListener( "touch", moveTouch )
+        Runtime:removeEventListener( "enterFrame", onTick )
+
     end 
 end
 
@@ -106,6 +135,23 @@ function scene:destroy( event )
 
     tileMap.mapCont:removeEventListener( "touch", moveTouch )
     Runtime:removeEventListener( "enterFrame", onTick )
+
+
+    print( "DESTORY SCENE" )
+
+    movingControl:destroy()
+    movingControl = nil
+    objControl:destroy()
+    objControl = nil
+    tileMap:destroy()
+    tileMap = nil
+    barControl:destroy()
+    barControl = nil
+    hunter = nil
+
+
+    noobhub:unsubscribe()
+
 
     -- Called prior to the removal of scene's "view" (sceneGroup)
     -- 

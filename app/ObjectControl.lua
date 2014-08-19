@@ -12,8 +12,8 @@ local lastTime = nil
 function ObjectControl:create(group)
 	self.container = group
 
-	self.addObjectTimer = 4000
-	self.currentAddObjectTime = 4000
+	self.addObjectTimer = 2000
+	self.currentAddObjectTime = 2000
 	self.lastTime = 0
 
 	self.objects = {}
@@ -56,7 +56,11 @@ function ObjectControl:tick(event)
 end
 
 function ObjectControl:destroy()
-	-- body
+	for k,obj in pairs(self.objects) do
+		obj:destroy()
+	end
+	self.objects = nil
+	self.hero = nil
 end
 
 return ObjectControl

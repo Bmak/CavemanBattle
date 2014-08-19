@@ -79,5 +79,13 @@ function BarControl:create(group)
 end
 
 
+function BarControl:destroy()
+	self.weaponGroup:removeSelf( )
+	self.weaponGroup = nil
+	self.killsGroup:removeSelf( )
+	self.killsGroup = nil
+	self.container = nil
+end
+
 
 return BarControl

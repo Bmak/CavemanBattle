@@ -45,7 +45,7 @@ function MovingControl:tick(event)
 		obj:tick(delta)
 		if obj.name == "bullet" and obj.pauseMove == false then
 			self:checkHitBullet(obj)
-		elseif obj.name == "bot" or obj.name == "hero" then
+		elseif obj.name == "bot" or obj.name == "hero" or obj.name == "player" then
 			self:checkPickUpBullet(obj)
 		end
 	end
@@ -102,7 +102,7 @@ function MovingControl:getTarget(obj)
 	local minDist = nil
 	local currentVictim = nil
 	for k,victim in pairs(self.players) do
-		if victim ~= obj and victim.isDead == false then
+		if victim ~= obj and victim.isDead == false and victim.view.alpha == 1 then
 			local dist = F:getDistance(victim,obj.view.x,obj.view.y)
 			if minDist == nil or minDist > dist then
 				minDist = dist
@@ -113,19 +113,34 @@ function MovingControl:getTarget(obj)
 	return currentVictim
 end
 
-function MovingControl:shoot(fromObj,toObj)
+function MovingControl:shoot(fromObj,x2,y2)
 	local bullet = Stone:new()
 	bullet:create(self.container)
 	bullet.view.x = fromObj.view.x
 	bullet.view.y = fromObj.view.y
-	bullet:move(toObj.view.x,toObj.view.y)
+	bullet:move(x2,y2)
 	self:addBullet(bullet)
-	fromObj:removeBullet(1)
 	bullet.parent = fromObj
 end
 
-function MovingControl:destroy( ... )
-	-- body
+function MovingControl:destroy()
+	self.allMovingObjects = nil
+	for k,player in pairs(self.players) do
+		player:destroy()
+	end
+	self.players = nil
+	for i,bullet in pairs(self.bullets) do
+		bullet:destroy()
+	end
+end
+
+function MovingControl:getPlayer(id)
+	for k,player in pairs(self.players) do
+		if id == player.id then
+			return player
+		end
+	end
+	return nil
 end
 
 return MovingControl
