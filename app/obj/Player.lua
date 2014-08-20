@@ -6,6 +6,7 @@ local MovingControl = require("app.MovingControl")
 local ObjectControl = require("app.ObjectControl")
 local F = require("app.F")
 local SC = require("app.SocketControl")
+local AnimBuild = require("app.animation.PlayerAnimBuilder")
 
 
 
@@ -31,7 +32,11 @@ function Player:new( ... )
 		R_Time = nil,
 		C_Time = nil,
 		isDead = nil,
-		maxBullets = nil
+		maxBullets = nil,
+		animations = nil,
+		isAnimating = nil,
+		objBuffer =nil,
+		tempAnim = nil
 	}
 	self.__index = self
   	return setmetatable(params, self)
@@ -39,13 +44,13 @@ end
 
 
 local function getSkin(stype)
-	local skin = nil
-	if stype == "hero" then
-		skin = "i/skin_1.png"
-	else
-		local id = math.round(math.random(2,4))
-		skin = "i/mskin_"..id..".png"
-	end
+	local skin = display.newImage("i/skin_1.png")
+	-- if stype == "hero" then
+	-- 	skin = "i/skin_1.png"
+	-- else
+	-- 	local id = math.round(math.random(2,4))
+	-- 	skin = "i/mskin_"..id..".png"
+	-- end
 	return skin
 end
 
@@ -54,10 +59,6 @@ function Player:create(group, type, id)
 	self.name = type
 	self.id = id
 	
-	-- self.view = display.newImage(tostring(getSkin(type)),0,0)
-	-- self.view.x = display.contentCenterX
-	-- self.view.y = display.contentCenterY
-
 	self.speed = 10
 	self.vx = 0
 	self.vy = 0
@@ -76,7 +77,21 @@ function Player:create(group, type, id)
 	self.C_Time = 2500
 	self.isDead = false
 
-	self:respawn()
+	self.animations = {}
+	self.isAnimating = false
+	self:addAnim()
+	self.objBuffer = display.newGroup( )
+	self.objBuffer.alpha = 0
+
+
+	if self.name ~= "player" then
+		self:respawn()
+	end
+end
+
+function Player:addAnim()
+	local anim = AnimBuild:createAnimMove()
+	table.insert( self.animations, anim )
 end
 
 function Player:tick(delta)
@@ -124,7 +139,11 @@ function Player:respawn(x,y)
 		self.view:removeSelf( )
 	end
 	
-	self.view = display.newImage(tostring(getSkin(self.name)),x,y)
+	local v = getSkin(self.name)
+	self.view = display.newGroup( )
+	self.view.x = x
+	self.view.y = y
+	self.view:insert(v)
 	self.view.alpha = 0.1
 	transition.to( self.view, {time=2000, alpha=1} )
 	-- local function complete( ... )
@@ -218,18 +237,29 @@ end
 function Player:kill(bullet)
 	-- if self.name == "hero" then return end
 	
-	if self.isDead == false then
-		self:dead()
-	end
+	-- if self.isDead == false then
+	-- 	self:dead()
+	-- end
+
+	-- local kills = 0
+	-- if bullet.parent.name == "hero" then
+	-- 	kills = bar:getKills() + 1
+	-- 	bar:setKills(kills)
+	-- elseif self.name == "hero" then
+	-- 	kills = bar:getKills() - 1
+	-- 	bar:setKills(kills)
+	-- 	SC:dead()
+	-- end
 
 	local kills = 0
-	if bullet.parent.name == "hero" then
+	if self.name == "player" or self.name == "bot" then
 		kills = bar:getKills() + 1
 		bar:setKills(kills)
 	elseif self.name == "hero" then
 		kills = bar:getKills() - 1
 		bar:setKills(kills)
 		SC:dead()
+		self:dead()
 	end
 end
 
@@ -245,10 +275,15 @@ function Player:dead()
 	transition.to( self.view, {time=1000,alpha=0.1} )
 end
 
-function Player:move(x,y)
+function Player:move(x,y,action)
 	if self.isDead == true then return end
 
-	SC:move(x,y)
+	if action == nil then
+		SC:move(x,y)
+	end
+
+
+
 
 	if self.name == "hero" then
 		if self.tap ~= nil then
@@ -274,6 +309,33 @@ function Player:move(x,y)
 	end
 
 	self.distToTarget = d
+
+	-- print(self.view[1])
+	-- if self.tempAnim then
+	-- 	self.objBuffer:insert(self.tempAnim)
+	-- end
+	-- print(self.view[1])
+	-- self.view:remove(1)
+
+	-- if dx > 0 then
+	-- 	self.view.xScale = -1
+	-- else
+	-- 	self.view.xScale = 1
+	-- end
+
+	-- if dy > 0 then
+	-- 	self.tempAnim = self.animations[1].anim
+	-- 	print("F")
+	-- 	-- print(anim)
+	-- else
+	-- 	self.tempAnim = self.animations[1].animBack
+	-- 	print("B")
+	-- 	-- print(anim)
+	-- end
+
+	-- print(self.tempAnim)
+	-- self.view:insert(self.tempAnim)
+	-- self.tempAnim:play()
 end
 
 function Player:destroy()

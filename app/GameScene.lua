@@ -31,17 +31,22 @@ function scene:create( event )
 
     SC:connect()
 
-
     local function addP(e)
         print("ADD NEW PLAYER "..e.id)
         local pl = player:new()
         pl:create(tileMap.mapCont, "player", e.id)
         movingControl:addPlayer(pl)
-        SC.listener:removeEventListener( "addNewPlayer", addP )
-        SC:reborn(hunter.view.x,hunter.view.y)
-        SC:move(hunter.targetX, hunter.targetY)
+        -- SC.listener:removeEventListener( "addNewPlayer", addP )
+        -- SC:reborn(hunter.view.x,hunter.view.y)
+        -- SC:move(hunter.targetX, hunter.targetY)
     end
-    SC.listener:addEventListener( "addNewPlayer", addP )
+    -- SC.listener:addEventListener( "addNewPlayer", addP )
+
+    local function showMe(e)
+        print("SHOW ME ")
+        SC:reborn(hunter.view.x,hunter.view.y)
+    end
+    -- SC.listener:addEventListener( "showMe", showMe )
 
     -- Called when the scene's view does not exist
     -- 

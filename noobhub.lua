@@ -119,7 +119,7 @@ noobhub = {
 
 		function self:enterFrame()
 				local input,output = socket.select({ self.sock },nil, 0) -- this is a way not to block runtime while reading socket. zero timeout does the trick
-
+				self.buffer = ''
 				for i,v in ipairs(input) do  -------------
 
 					local got_something_new = false

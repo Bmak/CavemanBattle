@@ -24,6 +24,22 @@ function scene:create( event )
    	bkg.y = display.contentCenterY
     sceneGroup:insert( bkg )
 
+
+    -- local sequenceData =
+    -- {
+    --     -- { name="walking", start=1, count=3 },
+    --     { name="running", start=1, count=12, time=500 },
+    --     -- { name="jumping", start=9, count=13, time=300 }
+    -- }
+    -- local sheetData1 = { width=60, height=96, numFrames=12, sheetContentWidth=256, sheetContentHeight=512 }
+    -- local sheet1 = graphics.newImageSheet( "i/anim/run_b1.png", sheetData1 )
+    -- local character = display.newSprite( sheet1, sequenceData )
+    -- character.xScale = 1.2
+    -- character.yScale = 1.2
+    -- character.x = display.contentWidth/2 ; character.y = display.contentHeight/2
+    -- character:play()
+
+
     local nextSceneButton = display.newImage("i/btn1.png",0,0)
     nextSceneButton.width = nextSceneButton.width*2
     nextSceneButton.height = nextSceneButton.height*2
