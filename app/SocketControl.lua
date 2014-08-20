@@ -22,7 +22,9 @@ end
 
 function SocketControl:login()
 	print("send login")
-	self.hub:publish({action="login",id=self.uniq_id})
+	if self.hub then
+		self.hub:publish({action="login",id=self.uniq_id})
+	end
 end
 
 function SocketControl:setCallBack()
@@ -63,32 +65,44 @@ end
 
 function SocketControl:move(px,py)
 	--print("send move")
-	self.hub:publish({action="move",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+	if self.hub then
+		self.hub:publish({action="move",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+	end
 end
 
 function SocketControl:throw(px,py)
 	--print("send throw")
-	self.hub:publish({action="throw",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+	if self.hub then
+		self.hub:publish({action="throw",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+	end
 end
 
 function SocketControl:dead()
 	--print("send dead")
-	self.hub:publish({action="dead",id=self.uniq_id})
+	if self.hub then
+		self.hub:publish({action="dead",id=self.uniq_id})
+	end
 end
 
 function SocketControl:reborn(px,py)
 	--print("send reborn")
-	self.hub:publish({action="reborn",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+	if self.hub then
+		self.hub:publish({action="reborn",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+	end
 end
 
 function SocketControl:pickUpStone(px,py)
 	--print("send pickUpStone")
-	self.hub:publish({action="pick",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+	if self.hub then
+		self.hub:publish({action="pick",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+	end
 end
 
 function SocketControl:disconnect()
 	--print("disconnect")
-	self.hub:unsubscribe()
+	if self.hub then
+		self.hub:unsubscribe()
+	end
 end
 
 return SocketControl
