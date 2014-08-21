@@ -45,7 +45,7 @@ function MovingControl:tick(event)
 		obj:tick(delta)
 		if obj.name == "bullet" and obj.pauseMove == false then
 			self:checkHitBullet(obj)
-		elseif obj.name == "bot" or obj.name == "hero" or obj.name == "player" then
+		elseif obj.name == "bot" or obj.name == "hero" then
 			self:checkPickUpBullet(obj)
 		end
 	end
@@ -68,11 +68,20 @@ function MovingControl:checkPickUpBullet(obj)
 	if obj.bulletsCount >= obj.maxBullets then return end
 
 	for k,weapon in pairs(ObjectControl.objects) do
-		if F:hasCollided(obj.view,weapon.view) then
+		if F:hasCollided(obj.view,weapon.view) and obj.isDead == false then
 			table.remove(ObjectControl.objects,k)
-			weapon.view:removeSelf( )
-			weapon = nil
-			obj:addBullet(5)
+			obj:addBullet(5,weapon.view.x,weapon.view.y)
+			weapon:destroy()
+			return
+		end
+	end
+end
+
+function MovingControl:removeWeapon(x,y)
+	for k,wep in pairs(ObjectControl.objects) do
+		if wep.view.x == x and wep.view.y == y then
+			wep:destroy()
+			table.remove( ObjectControl.objects, k )
 			return
 		end
 	end

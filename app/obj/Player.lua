@@ -33,10 +33,12 @@ function Player:new( ... )
 		C_Time = nil,
 		isDead = nil,
 		maxBullets = nil,
-		animations = nil,
+		animContainer = nil,
 		isAnimating = nil,
-		objBuffer =nil,
-		tempAnim = nil
+		currentAnim = nil,
+		nextAnimName = nil,
+		isBack = nil,
+		colors = nil
 	}
 	self.__index = self
   	return setmetatable(params, self)
@@ -72,26 +74,17 @@ function Player:create(group, type, id)
 	self.shootDelay = 1000
 	self.currentDelay = 1000
 
-
 	self.R_Time = 2500
 	self.C_Time = 2500
 	self.isDead = false
 
-	self.animations = {}
-	self.isAnimating = false
-	self:addAnim()
-	self.objBuffer = display.newGroup( )
-	self.objBuffer.alpha = 0
+	self.colors = { 0.5 + math.random(),0.5 + math.random(),0.5 + math.random() }
 
+	self.isAnimating = false
 
 	if self.name ~= "player" then
 		self:respawn()
 	end
-end
-
-function Player:addAnim()
-	local anim = AnimBuild:createAnimMove()
-	table.insert( self.animations, anim )
 end
 
 function Player:tick(delta)
@@ -120,8 +113,13 @@ function Player:tick(delta)
 end
 
 function Player:throw(x,y)
-	MovingControl:shoot(self,x,y)
-	self:removeBullet(1)
+	local function doThrow()
+		MovingControl:shoot(self,x,y)
+		self:removeBullet(1)
+	end
+	timer.performWithDelay( 100, doThrow, 1 )
+	
+	self:play("throw",self.isBack)
 end
 
 function Player:checkForResp(delta)
@@ -139,11 +137,13 @@ function Player:respawn(x,y)
 		self.view:removeSelf( )
 	end
 	
-	local v = getSkin(self.name)
 	self.view = display.newGroup( )
 	self.view.x = x
 	self.view.y = y
-	self.view:insert(v)
+	self.animContainer = display.newGroup( )
+	self.view:insert(self.animContainer)
+	self.isBack = 0
+	self:play("stay",self.isBack)
 	self.view.alpha = 0.1
 	transition.to( self.view, {time=2000, alpha=1} )
 	-- local function complete( ... )
@@ -170,6 +170,76 @@ function Player:respawn(x,y)
 		SC:reborn(self.view.x,self.view.y)
 	elseif self.name == "bot" then
 		self:smartBotStrategy()
+	end
+end
+
+function Player:play(name,back)
+	if self.currentAnim then
+		local anim = self:getAnimByName(name,back)
+		-- if self.currentAnim.name ~= anim.name and self.currentAnim.isBack ~= anim.isBack then
+			if anim.playOnce == true then
+				self.nextAnimName = self.currentAnim.name
+			end
+			self:playAnimation(anim)
+		-- end
+	else
+		self:playAnimation(self:getAnimByName("stay",back))
+	end
+end
+
+function Player:playAnimation(anim)
+	if self.currentAnim and self.currentAnim.priority > anim.priority then
+		self.nextAnimName = anim.name
+		anim.anim:removeSelf( )
+		anim = nil
+		return
+	elseif self.currentAnim and self.currentAnim.name == anim.name and self.currentAnim.isBack == anim.isBack then
+		-- and self.currentAnim.playOnce == true 
+		anim.anim:removeSelf( )
+		anim = nil
+		return
+	end
+	self:removeCurrentAnim()
+	self.currentAnim = anim
+	self.currentAnim.anim:setFillColor(self.colors[1],self.colors[2],self.colors[3])
+	self.animContainer:insert(self.currentAnim.anim)
+	self.currentAnim.anim:play()
+	self.isAnimating = true
+
+	if self.currentAnim.playOnce then
+		local function onEndAnim(event)
+			if event.phase == "loop" then
+				self.currentAnim.anim:removeEventListener( "sprite", onEndAnim )
+
+				if self.nextAnimName then
+					self:removeCurrentAnim()
+					self:play(self.nextAnimName,self.isBack)
+					self.nextAnimName = nil
+				end
+			end
+		end
+		self.currentAnim.anim:addEventListener( "sprite", onEndAnim )
+	end
+end
+
+function Player:removeCurrentAnim()
+	if self.currentAnim then
+		if self.currentAnim.anim then
+			self.currentAnim.anim:removeSelf( )
+		end
+		self.currentAnim = nil
+	end
+end
+
+function Player:getAnimByName(name, back)
+	if name == "stay" then
+		return AnimBuild:createAnimStay(back)
+	elseif name == "move" then
+		return AnimBuild:createAnimMove(back)
+	elseif name == "throw" then
+		return AnimBuild:createAnimThrow(back)
+	elseif name == "pick" then
+		return AnimBuild:createAnimPick(back)
 	end
 end
 
@@ -206,11 +276,13 @@ function Player:findWeapon()
 	return currentWeapon
 end
 
-function Player:addBullet(value)
+function Player:addBullet(value,x,y)
 	self.bulletsCount = self.bulletsCount + value
+	self:play("pick",self.isBack)
 	if self.name == "hero" then
+		SC:pick(x,y)
 		bar:setWeapCount(self.bulletsCount)
-	end 
+	end
 end
 function Player:removeBullet(value)
 	self.bulletsCount = self.bulletsCount - value
@@ -227,6 +299,8 @@ function Player:stopMoving()
 	if self.name == "bot" and self.isDead == false then
 		self:smartBotStrategy()
 	end
+
+	self:play("stay",self.isBack)
 
 	if self.tap ~= nil then
 		self.tap:removeSelf()
@@ -268,6 +342,7 @@ function Player:dead()
 	self:stopMoving()
 	local x = self.view.x
 	local y = self.view.y
+	self:removeCurrentAnim()
 	self.view:removeSelf( )
 	self.view = display.newImage("i/dead.png",x,y)
 	self.container:insert(self.view)
@@ -281,9 +356,6 @@ function Player:move(x,y,action)
 	if action == nil then
 		SC:move(x,y)
 	end
-
-
-
 
 	if self.name == "hero" then
 		if self.tap ~= nil then
@@ -310,32 +382,19 @@ function Player:move(x,y,action)
 
 	self.distToTarget = d
 
-	-- print(self.view[1])
-	-- if self.tempAnim then
-	-- 	self.objBuffer:insert(self.tempAnim)
-	-- end
-	-- print(self.view[1])
-	-- self.view:remove(1)
+	if dx > 0 then
+		self.view.xScale = -1
+	else
+		self.view.xScale = 1
+	end
 
-	-- if dx > 0 then
-	-- 	self.view.xScale = -1
-	-- else
-	-- 	self.view.xScale = 1
-	-- end
-
-	-- if dy > 0 then
-	-- 	self.tempAnim = self.animations[1].anim
-	-- 	print("F")
-	-- 	-- print(anim)
-	-- else
-	-- 	self.tempAnim = self.animations[1].animBack
-	-- 	print("B")
-	-- 	-- print(anim)
-	-- end
-
-	-- print(self.tempAnim)
-	-- self.view:insert(self.tempAnim)
-	-- self.tempAnim:play()
+	if dy > 0 then
+		self:play("move",0)
+		self.isBack = 0
+	else
+		self:play("move",1)
+		self.isBack = 1
+	end
 end
 
 function Player:destroy()

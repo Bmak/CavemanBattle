@@ -1,5 +1,6 @@
 require("noobhub")
 local MC = require("app.MovingControl")
+local OC = require("app.ObjectControl")
 
 SocketControl = {}
 
@@ -18,12 +19,12 @@ function SocketControl:connect()
 
 	print("connect")
 	self:setCallBack()
-	self:login()
+	-- self:login()
 
 	local function ping()
 		self:ping()
 	end
-	-- self.pingTimer = timer.performWithDelay( 500, ping, 0)
+	self.pingTimer = timer.performWithDelay( 200, ping, 0)
 end
 
 function SocketControl:login()
@@ -40,7 +41,13 @@ function SocketControl:setCallBack()
             print("message received  = "..json.encode(buffer));
             
             for k,message in pairs(buffer) do
-            	-- print("MESSAGE "..k)
+
+            	if message.action == "stone_added" then
+            		OC:addObject(message.x,message.y)
+            	elseif message.action == "stone_removed" then
+            		OC:removeObject(message.x,message.y)
+            	end
+
             	local player = nil
             	if message.action == "login" then
             		self.listener:dispatchEvent( {name="showMe"} )
@@ -103,8 +110,8 @@ function SocketControl:reborn(px,py)
 	end
 end
 
-function SocketControl:pickUpStone(px,py)
-	--print("send pickUpStone")
+function SocketControl:pick(px,py)
+	--print("send pick")
 	if self.hub then
 		self.hub:publish({action="pick",id=self.uniq_id,x=math.round(px),y=math.round(py)})
 	end

@@ -40,18 +40,14 @@ function scene:create( event )
         -- SC:reborn(hunter.view.x,hunter.view.y)
         -- SC:move(hunter.targetX, hunter.targetY)
     end
-    -- SC.listener:addEventListener( "addNewPlayer", addP )
+    SC.listener:addEventListener( "addNewPlayer", addP )
 
     local function showMe(e)
         print("SHOW ME ")
         SC:reborn(hunter.view.x,hunter.view.y)
     end
-    -- SC.listener:addEventListener( "showMe", showMe )
+    SC.listener:addEventListener( "showMe", showMe )
 
-    -- Called when the scene's view does not exist
-    -- 
-    -- INSERT code here to initialize the scene
-    -- e.g. add display objects to 'sceneGroup', add touch listeners, etc
     print( "CREATE SCENE" )
 
     tileMap:create(sceneGroup)
@@ -66,7 +62,9 @@ function scene:create( event )
 
     barControl:create(sceneGroup)
 
-    -- for i=1,4 do
+    SC:login()
+
+    -- for i=1,1 do
     --     local duck = player:new()
     --     duck:create(tileMap.mapCont, "bot")
     --     duck:randomMove()
@@ -82,10 +80,41 @@ function scene:create( event )
     end
     tileMap.mapCont:addEventListener( "touch", moveTouch )
     Runtime:addEventListener( "enterFrame", onTick )
+
+
+    self:onShowMem()
+end
+
+function scene:onShowMem()
+    local sceneGroup = self.view
+    local text = display.newText( "mem: "..collectgarbage( "count" )/1000 .. " MB", 0, 0, native.systemFont, 20 )
+    local text2 = display.newText( "texture: "..system.getInfo( "textureMemoryUsed" )*0.000001 .. " MB", 0, 0, native.systemFont, 20 )
+    text.anchorX = 0
+    text.anchorY = 0
+    text.x = 10
+    text.y = display.pixelWidth - 50
+    text2.anchorX = 0
+    text2.anchorY = 0
+    text2.x = 10
+    text2.y = display.pixelWidth - 25
+
+    text:setFillColor(0, 0, 0)
+    text2:setFillColor(0, 0, 0)
+    sceneGroup:insert(text)
+    sceneGroup:insert(text2)
+
+    local function showMem()
+        collectgarbage()
+        text.text = "mem: "..collectgarbage( "count" )/1000 .. " MB"
+        text2.text = "texture: "..system.getInfo( "textureMemoryUsed" )*0.000001 .. " MB"
+    end
+
+    timer.performWithDelay( 1000, showMem, 0 )
 end
 
 function scene:onHunterMove(event)
-	if event.phase == "moved" or event.phase == "began" then
+	-- if event.phase == "moved" or event.phase == "began" then
+    if event.phase == "began" then
 		hunter:move(event.x - tileMap.mapCont.x,event.y - tileMap.mapCont.y)
 	end
 end
