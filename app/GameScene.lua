@@ -29,7 +29,7 @@ function scene:create( event )
 
     print("TRY TO CONNECT")
 
-    SC:connect()
+    SC:connect(composer.player)
 
     local function addP(e)
         print("ADD NEW PLAYER "..e.id)

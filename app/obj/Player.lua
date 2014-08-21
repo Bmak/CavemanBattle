@@ -38,7 +38,8 @@ function Player:new( ... )
 		currentAnim = nil,
 		nextAnimName = nil,
 		isBack = nil,
-		colors = nil
+		colors = nil,
+		logout = nil
 	}
 	self.__index = self
   	return setmetatable(params, self)
@@ -60,6 +61,7 @@ function Player:create(group, type, id)
 	self.container = group
 	self.name = type
 	self.id = id
+	self.logout = false
 	
 	self.speed = 10
 	self.vx = 0
@@ -325,13 +327,13 @@ function Player:kill(bullet)
 	-- 	SC:dead()
 	-- end
 
-	local kills = 0
+	-- local kills = 0
 	if self.name == "player" or self.name == "bot" then
-		kills = bar:getKills() + 1
-		bar:setKills(kills)
+		-- kills = bar:getKills() + 1
+		-- bar:setKills(kills)
 	elseif self.name == "hero" then
-		kills = bar:getKills() - 1
-		bar:setKills(kills)
+		-- kills = bar:getKills() - 1
+		-- bar:setKills(kills)
 		SC:dead()
 		self:dead()
 	end
@@ -398,11 +400,15 @@ function Player:move(x,y,action)
 end
 
 function Player:destroy()
-	if self.view then
-		self.view:removeSelf( )
+	self.logout = true
+	local function complete( ... )
+		if self.view then
+			self.view:removeSelf( )
+		end
+		self.view = nil
+		self.container = nil
 	end
-	self.view = nil
-	self.container = nil
+	transition.to( self.view, {time=1000,alpha=0,onComplete=complete()} )
 end
 
 return Player

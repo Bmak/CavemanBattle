@@ -1,6 +1,7 @@
 require("noobhub")
 local MC = require("app.MovingControl")
 local OC = require("app.ObjectControl")
+local results = require("app.obj.ResultTable")
 
 SocketControl = {}
 
@@ -8,23 +9,27 @@ local hub = nil
 local uniq_id = nil
 local listener = nil
 local pingTimer = nil
+local playerName = nil
 
-function SocketControl:connect()
+function SocketControl:connect(name)
 	local hserver = "198.211.120.236"
 	local hport = 8080
 	self.hub = noobhub.new({ server = hserver; port = hport; })
+	self.playerName = name
 
 	self.uniq_id = system.getInfo('deviceID')
 	self.listener = display.newGroup( )
 
-	print("connect")
+	print("PLAYER NAME "..self.playerName)
 	self:setCallBack()
 	-- self:login()
+
+	-- results:show()
 
 	local function ping()
 		self:ping()
 	end
-	self.pingTimer = timer.performWithDelay( 200, ping, 0)
+	-- self.pingTimer = timer.performWithDelay( 50, ping, 0)
 end
 
 function SocketControl:login()
@@ -66,6 +71,9 @@ function SocketControl:setCallBack()
 	            		end
 	            		if message.action == "dead" then
 	            			player:dead(message.x,message.y)
+	            		end
+	            		if message.action == "logout" then
+	            			MC:removePlayer(player)
 	            		end
 	            	elseif message.action == "reborn" then
 	            		self.listener:dispatchEvent( {name="addNewPlayer",id=message.id} )

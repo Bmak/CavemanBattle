@@ -40,6 +40,33 @@ function scene:create( event )
     -- add the touch event listener to the button
     nextSceneButton:addEventListener( "touch", nextSceneButton )
 
+    local titleText = display.newText( "Input your name:", display.contentCenterX, display.contentCenterY - 50, native.systemFont, 30 )
+    sceneGroup:insert(titleText)
+    local defaultField
+    local function textListener( event )
+        print(event.phase)
+        if ( event.phase == "began" ) then
+            -- user begins editing text field
+            print( event.text )
+        elseif ( event.phase == "ended" or event.phase == "submitted" ) then
+            -- text field loses focus
+            -- do something with defaultField's text
+            print( event.text )
+        elseif ( event.phase == "editing" ) then
+            print( event.newCharacters )
+            print( event.oldText )
+            print( event.startPosition )
+            print( event.text )
+            composer.player = event.text
+        end
+    end
+    defaultField = native.newTextField( display.contentCenterX, display.contentCenterY, 250, 70 )
+    defaultField.text = "player"
+    defaultField:addEventListener( "userInput", textListener )
+    composer.player = "player"
+    sceneGroup:insert(defaultField)
+
+
 
     -- local st = stone:new()
     -- st:create(sceneGroup)

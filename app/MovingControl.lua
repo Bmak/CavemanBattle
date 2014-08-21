@@ -14,6 +14,7 @@ local F = require("app.F")
 function MovingControl:init(group)
 	self.container = group
 
+	self.weapons = {}
 	self.players = {}
 	self.bullets = {}
 	self.allMovingObjects = {}
@@ -47,6 +48,9 @@ function MovingControl:tick(event)
 			self:checkHitBullet(obj)
 		elseif obj.name == "bot" or obj.name == "hero" then
 			self:checkPickUpBullet(obj)
+		end
+		if obj.logout ~= nil and obj.logout == true then
+			table.remove( self.allMovingObjects, table.indexOf( self.allMovingObjects, obj) )
 		end
 	end
 end
@@ -94,6 +98,7 @@ end
 
 function MovingControl:removePlayer(obj)
 	table.remove( self.players, table.indexOf( self.players, obj) )
+	obj:destroy()
 	-- table.remove( self.allMovingObjects, table.indexOf( self.allMovingObjects, obj) )
 end
 
