@@ -80,11 +80,13 @@ function Player:create(group, type, id)
 	self.C_Time = 2500
 	self.isDead = false
 
-	self.colors = { 0.5 + math.random(),0.5 + math.random(),0.5 + math.random() }
+	self.colors = { math.random()*0.9,math.random()*0.9,math.random()*0.9 }
+
 
 	self.isAnimating = false
 
 	if self.name ~= "player" then
+		self.colors = {1,1,1}
 		self:respawn()
 	end
 end
@@ -115,11 +117,11 @@ function Player:tick(delta)
 end
 
 function Player:throw(x,y)
-	local function doThrow()
+	-- local function doThrow()
 		MovingControl:shoot(self,x,y)
 		self:removeBullet(1)
-	end
-	timer.performWithDelay( 100, doThrow, 1 )
+	-- end
+	-- timer.performWithDelay( 100, doThrow, 1 )
 	
 	self:play("throw",self.isBack)
 end
@@ -190,6 +192,12 @@ function Player:play(name,back)
 end
 
 function Player:playAnimation(anim)
+	if self.view == nil or self.animContainer == nil then
+		anim.anim:removeSelf( )
+		anim = nil
+		return
+	end
+
 	if self.currentAnim and self.currentAnim.priority > anim.priority then
 		self.nextAnimName = anim.name
 		anim.anim:removeSelf( )
@@ -204,6 +212,12 @@ function Player:playAnimation(anim)
 	self:removeCurrentAnim()
 	self.currentAnim = anim
 	self.currentAnim.anim:setFillColor(self.colors[1],self.colors[2],self.colors[3])
+	print("animepta")
+	print(self.view)
+	print(self.animContainer)
+	print(self.currentAnim)
+	print(self.currentAnim.anim)
+	print(self.currentAnim.anim.parent)
 	self.animContainer:insert(self.currentAnim.anim)
 	self.currentAnim.anim:play()
 	self.isAnimating = true
@@ -225,10 +239,17 @@ function Player:playAnimation(anim)
 end
 
 function Player:removeCurrentAnim()
-	if self.currentAnim then
-		if self.currentAnim.anim then
-			self.currentAnim.anim:removeSelf( )
+	if self.currentAnim ~= nil then
+
+		print("remove animepta")
+		print(self.view)
+		print(self.currentAnim)
+		print(self.currentAnim.anim)
+		print(self.currentAnim.anim.parent)
+		if self.currentAnim.anim.parent then
+			self.currentAnim.anim:removeSelf()
 		end
+		
 		self.currentAnim = nil
 	end
 end
@@ -334,9 +355,14 @@ function Player:kill(bullet)
 	elseif self.name == "hero" then
 		-- kills = bar:getKills() - 1
 		-- bar:setKills(kills)
-		SC:dead()
+		SC:dead(bullet.parent.id)
 		self:dead()
 	end
+end
+
+function Player:addPoint()
+	kills = bar:getKills() + 1
+	bar:setKills(kills)
 end
 
 function Player:dead()

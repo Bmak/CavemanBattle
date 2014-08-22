@@ -29,13 +29,13 @@ function SocketControl:connect(name)
 	local function ping()
 		self:ping()
 	end
-	-- self.pingTimer = timer.performWithDelay( 50, ping, 0)
+	self.pingTimer = timer.performWithDelay( 50, ping, 0)
 end
 
 function SocketControl:login()
 	print("send login")
 	if self.hub then
-		self.hub:publish({action="login",id=self.uniq_id})
+		self.hub:publish({action="login",id=self.uniq_id,time=os.time()})
 	end
 end
 
@@ -43,6 +43,7 @@ function SocketControl:setCallBack()
 	self.hub:subscribe({
         channel = "ping-channel";
         callback = function(buffer) 
+        	if buffer == nil then return end
             print("message received  = "..json.encode(buffer));
             
             for k,message in pairs(buffer) do
@@ -70,6 +71,10 @@ function SocketControl:setCallBack()
 	            			player:throw(message.x,message.y)
 	            		end
 	            		if message.action == "dead" then
+	            			-- local killer = MC:getPlayer(message.killer)
+	            			-- if killer.name == "hero" then
+	            			-- 	killer:addPoint()
+	            			-- end
 	            			player:dead(message.x,message.y)
 	            		end
 	            		if message.action == "logout" then
@@ -86,42 +91,38 @@ function SocketControl:setCallBack()
     });
 end
 
-function parse(data)
-	
-end
-
 function SocketControl:move(px,py)
-	-- print("send move")
+	print("send move "..os.time())
 	if self.hub then
-		self.hub:publish({action="move",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+		self.hub:publish({action="move",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
 	end
 end
 
 function SocketControl:throw(px,py)
-	-- print("send throw")
+	print("send throw "..os.time())
 	if self.hub then
-		self.hub:publish({action="throw",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+		self.hub:publish({action="throw",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
 	end
 end
 
-function SocketControl:dead()
-	-- print("send dead")
+function SocketControl:dead(killer_id)
+	print("send dead "..os.time())
 	if self.hub then
-		self.hub:publish({action="dead",id=self.uniq_id})
+		self.hub:publish({action="dead",id=self.uniq_id,killer=killer_id,time=os.time()})
 	end
 end
 
 function SocketControl:reborn(px,py)
-	-- print("send reborn")
+	print("send reborn "..os.time())
 	if self.hub then
-		self.hub:publish({action="reborn",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+		self.hub:publish({action="reborn",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
 	end
 end
 
 function SocketControl:pick(px,py)
-	--print("send pick")
+	print("send pick "..os.time())
 	if self.hub then
-		self.hub:publish({action="pick",id=self.uniq_id,x=math.round(px),y=math.round(py)})
+		self.hub:publish({action="pick",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
 	end
 end
 
