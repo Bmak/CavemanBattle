@@ -6,7 +6,7 @@ local ResultTable = {}
 
 function ResultTable:show(data)
 	local group = composer.stage
-	data = {{name="killer",kills=10,deads=5},{name="bigmac",kills=2,deads=15},{name="player",kills=5,deads=3}}
+	-- data = {{name="killer",kills=10,deaths=5},{name="bigmac",kills=2,deaths=15},{name="player",kills=5,deaths=3}}
 
 	local rect = display.newRect( 100, 100, display.pixelHeight-100, display.pixelWidth-100 )
 	rect.x = display.contentCenterX
@@ -28,10 +28,10 @@ function ResultTable:show(data)
 	killsTitle.x = nameTitle.x + 200
 	killsTitle.y = rect.y - rect.height/2 + 150
     group:insert(killsTitle)
-    local deadsTitle = display.newText( "DEADS", 0, 0, native.systemFont, 30 )
-	deadsTitle.x = killsTitle.x + 200
-	deadsTitle.y = rect.y - rect.height/2 + 150
-    group:insert(deadsTitle)
+    local deathsTitle = display.newText( "DEATHS", 0, 0, native.systemFont, 30 )
+	deathsTitle.x = killsTitle.x + 200
+	deathsTitle.y = rect.y - rect.height/2 + 150
+    group:insert(deathsTitle)
 
     if data == nil then return end
     for k,info in pairs(data) do
@@ -40,13 +40,13 @@ function ResultTable:show(data)
 		box:insert(nameTxt)
 		local killsTxt = display.newText(info.kills, 200, 0, native.systemFont, 25 )
 		box:insert(killsTxt)
-		local deadsTxt = display.newText(info.deads, 400, 0, native.systemFont, 25 )
-		box:insert(deadsTxt)
+		local deathsTxt = display.newText(info.deaths, 400, 0, native.systemFont, 25 )
+		box:insert(deathsTxt)
 
-		if info.name == composer.playerName then
+		if info.name == composer.player then
 			nameTxt:setFillColor( 0.2,1,0.2 )
 			killsTxt:setFillColor( 0.2,1,0.2 )
-			deadsTxt:setFillColor( 0.2,1,0.2 )
+			deathsTxt:setFillColor( 0.2,1,0.2 )
 		end
 		
     	box.x = nameTitle.x

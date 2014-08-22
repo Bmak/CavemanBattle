@@ -22,9 +22,7 @@ function SocketControl:connect(name)
 
 	print("PLAYER NAME "..self.playerName)
 	self:setCallBack()
-	-- self:login()
-
-	-- results:show()
+	self:login()
 
 	local function ping()
 		self:ping()
@@ -35,7 +33,7 @@ end
 function SocketControl:login()
 	print("send login")
 	if self.hub then
-		self.hub:publish({action="login",id=self.uniq_id,time=os.time()})
+		self.hub:publish({action="login",id=self.uniq_id,name=self.playerName,time=os.time()})
 	end
 end
 
@@ -47,6 +45,14 @@ function SocketControl:setCallBack()
             print("message received  = "..json.encode(buffer));
             
             for k,message in pairs(buffer) do
+
+
+            	if message.action == "result" then
+            		results:show(message.data)
+            		self:disconnect()
+            		self.listener:dispatchEvent( {name="worldStop"} )
+            		-- return
+            	end
 
             	if message.action == "stone_added" then
             		OC:addObject(message.x,message.y)
@@ -71,10 +77,10 @@ function SocketControl:setCallBack()
 	            			player:throw(message.x,message.y)
 	            		end
 	            		if message.action == "dead" then
-	            			-- local killer = MC:getPlayer(message.killer)
-	            			-- if killer.name == "hero" then
-	            			-- 	killer:addPoint()
-	            			-- end
+	            			local killer = MC:getPlayer(message.killer)
+	            			if killer.name == "hero" then
+	            				killer:addPoint()
+	            			end
 	            			player:dead(message.x,message.y)
 	            		end
 	            		if message.action == "logout" then
@@ -134,7 +140,7 @@ function SocketControl:ping()
 end
 
 function SocketControl:disconnect()
-	--print("disconnect")
+	print("disconnect")
 	timer.cancel( self.pingTimer )
 	if self.hub then
 		self.hub:unsubscribe()

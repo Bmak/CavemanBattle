@@ -48,6 +48,8 @@ function scene:create( event )
     end
     SC.listener:addEventListener( "showMe", showMe )
 
+   
+
     print( "CREATE SCENE" )
 
     tileMap:create(sceneGroup)
@@ -62,7 +64,7 @@ function scene:create( event )
 
     barControl:create(sceneGroup)
 
-    SC:login()
+    -- SC:login()
 
     -- for i=1,1 do
     --     local duck = player:new()
@@ -80,6 +82,12 @@ function scene:create( event )
     end
     tileMap.mapCont:addEventListener( "touch", moveTouch )
     Runtime:addEventListener( "enterFrame", onTick )
+
+    local function onStopWorld(e)
+        tileMap.mapCont:removeEventListener( "touch", moveTouch )
+        Runtime:removeEventListener( "enterFrame", onTick )
+    end
+    SC.listener:addEventListener( "worldStop", onStopWorld )
 
 
     self:onShowMem()
