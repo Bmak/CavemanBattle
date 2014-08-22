@@ -74,7 +74,7 @@ function MovingControl:checkPickUpBullet(obj)
 	for k,weapon in pairs(ObjectControl.objects) do
 		if F:hasCollided(obj.view,weapon.view) and obj.isDead == false then
 			table.remove(ObjectControl.objects,k)
-			obj:addBullet(5,weapon.view.x,weapon.view.y)
+			obj:addBullet(3,weapon.view.x,weapon.view.y)
 			weapon:destroy()
 			return
 		end

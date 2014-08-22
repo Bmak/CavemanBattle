@@ -118,8 +118,8 @@ end
 
 function Player:throw(x,y)
 	-- local function doThrow()
-		MovingControl:shoot(self,x,y)
-		self:removeBullet(1)
+	MovingControl:shoot(self,x,y)
+	self:removeBullet(1)
 	-- end
 	-- timer.performWithDelay( 100, doThrow, 1 )
 	
@@ -212,12 +212,13 @@ function Player:playAnimation(anim)
 	self:removeCurrentAnim()
 	self.currentAnim = anim
 	self.currentAnim.anim:setFillColor(self.colors[1],self.colors[2],self.colors[3])
-	print("animepta")
+	print("animepta "..self.name)
 	print(self.view)
 	print(self.animContainer)
 	print(self.currentAnim)
 	print(self.currentAnim.anim)
 	print(self.currentAnim.anim.parent)
+	print(self.nextAnimName)
 	self.animContainer:insert(self.currentAnim.anim)
 	self.currentAnim.anim:play()
 	self.isAnimating = true
@@ -240,12 +241,11 @@ end
 
 function Player:removeCurrentAnim()
 	if self.currentAnim ~= nil then
-
-		print("remove animepta")
-		print(self.view)
-		print(self.currentAnim)
-		print(self.currentAnim.anim)
-		print(self.currentAnim.anim.parent)
+		-- print("remove animepta")
+		-- print(self.view)
+		-- print(self.currentAnim)
+		-- print(self.currentAnim.anim)
+		-- print(self.currentAnim.anim.parent)
 		if self.currentAnim.anim.parent then
 			self.currentAnim.anim:removeSelf()
 		end
