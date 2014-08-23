@@ -76,9 +76,9 @@ function Stone:move(x,y)
 	self.distToTarget = d
 end
 
-function Stone:destroy( ... )
-	if self.view then
-		self.view:removeSelf( )
+function Stone:destroy()
+	if self.view and self.view.parent then
+		self.view:removeSelf()
 	end
 	self.view = nil
 	self.container = nil
