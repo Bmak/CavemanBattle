@@ -132,7 +132,8 @@ noobhub = {
 					end -- /while-do
 
 					-- local i = 0
-					while got_something_new do 
+					while got_something_new do
+						print("message received  = "..self.buffer)
 						local message = tostring(self.buffer)
 						local data = json.decode(message)
 						self.callback(  data  )

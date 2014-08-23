@@ -8,11 +8,44 @@ local composer = require( "composer" )
 local bezier = require("app.bezier")
 local stone = require("app.obj.Stone")
 
+local nickTxt = nil
 
 -- Load scene with same root filename as this file
 local scene = composer.newScene(  )
 
 ---------------------------------------------------------------------------------
+
+local function onSave()
+    local saveData = composer.player
+
+    local path = system.pathForFile( "cavemaninfo.txt", system.DocumentsDirectory )
+
+    -- print("SAVE "..path)
+
+    local file = io.open( path, "w" )
+    file:write( saveData )
+
+    io.close( file )
+    file = nil
+end
+
+local function onLoad(txt)
+    local path = system.pathForFile( "cavemaninfo.txt", system.DocumentsDirectory )
+
+    -- print("LOAD "..path)
+
+    local file = io.open( path, "r" )
+    if file then
+        composer.player = file:read( "*a" )
+
+        io.close( file )
+        file = nil
+    else
+        onSave()
+    end
+    txt.text = composer.player
+end
+
 
 function scene:create( event )
     local sceneGroup = self.view
@@ -35,6 +68,8 @@ function scene:create( event )
         local phase = event.phase
         if "ended" == phase then
             composer.gotoScene( "app.GameScene", { effect = "fade", time = 300 } )
+
+            onSave()
         end
     end
     -- add the touch event listener to the button
@@ -42,7 +77,6 @@ function scene:create( event )
 
     local titleText = display.newText( "Input your name:", display.contentCenterX, display.contentCenterY - 50, native.systemFont, 30 )
     sceneGroup:insert(titleText)
-    local defaultField
     local function textListener( event )
         print(event.phase)
         if ( event.phase == "began" ) then
@@ -50,7 +84,7 @@ function scene:create( event )
             print( event.text )
         elseif ( event.phase == "ended" or event.phase == "submitted" ) then
             -- text field loses focus
-            -- do something with defaultField's text
+            -- do something with nickTxt's text
             print( event.text )
         elseif ( event.phase == "editing" ) then
             print( event.newCharacters )
@@ -60,11 +94,15 @@ function scene:create( event )
             composer.player = event.text
         end
     end
-    defaultField = native.newTextField( display.contentCenterX, display.contentCenterY, 250, 70 )
-    defaultField.text = "player"
-    defaultField:addEventListener( "userInput", textListener )
+    self.nickTxt = native.newTextField( display.contentCenterX, display.contentCenterY, 250, 70 )
+    self.nickTxt.text = "player"
+    self.nickTxt:addEventListener( "userInput", textListener )
     composer.player = "player"
-    sceneGroup:insert(defaultField)
+    sceneGroup:insert(self.nickTxt)
+
+    onLoad(self.nickTxt)
+
+
 
 
 

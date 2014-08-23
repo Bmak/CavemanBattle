@@ -57,10 +57,12 @@ function TileMap:addRandomObjects()
 		self.mapCont:insert(dot)
 	end
 
-	for i=1,3 do
+	for i=1,1 do
 		local pool = display.newImage("i/pool.png",0,0)
-		pool.x = math.random(250,maxX-200)
-		pool.y = math.random(250,maxY-200)
+		pool.x = self.container.width/2
+		pool.y = self.container.height/2
+		-- pool.x = math.random(250,maxX-200)
+		-- pool.y = math.random(250,maxY-200)
 		table.insert( self.randomObjects, pool )
 		self.mapCont:insert(pool)
 	end

@@ -25,6 +25,7 @@ function SocketControl:connect(name)
 	self:login()
 
 	-- results:show()
+	
 
 	local function ping()
 		self:ping()
@@ -44,7 +45,7 @@ function SocketControl:setCallBack()
         channel = "ping-channel";
         callback = function(buffer) 
         	if buffer == nil then return end
-            print("message received  = "..json.encode(buffer));
+            -- print("message received  = "..json.encode(buffer));
             
             for k,message in pairs(buffer) do
 
