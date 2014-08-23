@@ -24,6 +24,8 @@ function SocketControl:connect(name)
 	self:setCallBack()
 	self:login()
 
+	-- results:show()
+
 	local function ping()
 		self:ping()
 	end

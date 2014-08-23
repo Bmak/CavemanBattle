@@ -74,10 +74,10 @@ function scene:create( event )
     -- end
 
 
-    local function moveTouch(event)
+    function moveTouch(event)
         self:onHunterMove(event)
     end
-    local function onTick(event)
+    function onTick(event)
         self:worldTick(event)
     end
     tileMap.mapCont:addEventListener( "touch", moveTouch )
@@ -192,7 +192,8 @@ function scene:destroy( event )
     hunter = nil
 
 
-    noobhub:unsubscribe()
+    SC:disconnect()
+    SC = nil
 
 
     -- Called prior to the removal of scene's "view" (sceneGroup)
