@@ -89,8 +89,8 @@ noobhub = {
 					self:reconnect()
 					return false;
 				end
-				-- local send_result, message, num_bytes = self.sock:send("__JSON__START__"..json.encode(message.message).."__JSON__END__")
-				local send_result, message, num_bytes = self.sock:send(json.encode(message))
+				local send_result, message, num_bytes = self.sock:send("#"..json.encode(message.message).."#")
+				-- local send_result, message, num_bytes = self.sock:send(json.encode(message))
 				if (send_result == nil) then
 					print("Noobhub publish error: "..message..'  sent '..num_bytes..' bytes');
 					if (message == 'closed') then  self:reconnect() end
@@ -119,7 +119,7 @@ noobhub = {
 
 		function self:enterFrame()
 				local input,output = socket.select({ self.sock },nil, 0) -- this is a way not to block runtime while reading socket. zero timeout does the trick
-				self.buffer = ''
+				-- self.buffer = ''
 				for i,v in ipairs(input) do  -------------
 
 					local got_something_new = false
@@ -130,30 +130,30 @@ noobhub = {
 						if (not skt) then break; end
 						if (e) then break; end
 					end -- /while-do
-
+					
 					-- local i = 0
-					while got_something_new do
+					-- while got_something_new do
 						print("message received  = "..self.buffer)
-						local message = tostring(self.buffer)
-						local data = json.decode(message)
-						self.callback(  data  )
-						-- i = i + 1
-						-- if (i == 2) then break end
-						break
-					end -- /while-do
+					-- 	local message = tostring(self.buffer)
+					-- 	local data = json.decode(message)
+					-- 	self.callback(  data  )
+					-- 	-- i = i + 1
+					-- 	-- if (i == 2) then break end
+					-- 	break
+					-- end
 					-- now, checking if a message is present in buffer...
-					-- while got_something_new do  --  this is for a case of several messages stocker in the buffer
-					-- 		local start = string.find(self.buffer,'__JSON__START__')
-					-- 		local finish = string.find(self.buffer,'__JSON__END__')
-					-- 		if (start and finish) then -- found a message!
-					-- 			local message = string.sub(self.buffer, start+15, finish-1)
-					-- 			self.buffer = string.sub(self.buffer, 1, start-1)  ..   string.sub(self.buffer, finish + 13 ) -- cutting our message from buffer
-					-- 			local data = json.decode(message)
-					-- 			-- self.callback(  data  )
-					-- 		else
-					-- 			break
-					-- 		end
-					-- end -- /while-do
+					while got_something_new do  --  this is for a case of several messages stocker in the buffer
+						local start = string.find(self.buffer,'#')
+						local finish = string.find(self.buffer,'#')
+						if (start and finish) then -- found a message!
+							local message = string.sub(self.buffer, start+1, finish-1)
+							self.buffer = string.sub(self.buffer, 1, start-1)  ..   string.sub(self.buffer, finish + 1 ) -- cutting our message from buffer
+							local data = json.decode(message)
+							self.callback(  data  )
+						else
+							break
+						end
+					end -- /while-do
 
 				end -- / for-do
 				

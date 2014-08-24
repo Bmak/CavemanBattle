@@ -8,7 +8,6 @@ local composer = require( "composer" )
 local tileMap = require("app.map.TileMap")
 local player = require("app.obj.Player")
 -- local Duck = require("app.obj.Duck")
-local objControl = require("app.ObjectControl")
 local movingControl = require("app.MovingControl")
 local barControl = require("app.BarControl")
 local SC = require("app.SocketControl")
@@ -49,17 +48,14 @@ function scene:create( event )
     SC.listener:addEventListener( "showMe", showMe )
 
    
-
     print( "CREATE SCENE" )
 
     tileMap:create(sceneGroup)
-    objControl:create(tileMap.mapCont)
     movingControl:init(tileMap.mapCont)
 
     hunter = player:new()
     hunter:create(tileMap.mapCont, "hero", system.getInfo('deviceID'))
     tileMap:setHero(hunter)
-    objControl:setHero(hunter)
     movingControl:addPlayer(hunter)
 
     barControl:create(sceneGroup)
@@ -130,7 +126,6 @@ end
 function scene:worldTick( event )
     movingControl:tick(event)
     tileMap:tick(event)
-    objControl:tick(event)
 end
 
 function scene:show( event )

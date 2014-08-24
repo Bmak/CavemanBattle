@@ -1,6 +1,5 @@
 require("noobhub")
 local MC = require("app.MovingControl")
-local OC = require("app.ObjectControl")
 local results = require("app.obj.ResultTable")
 
 SocketControl = {}
@@ -58,9 +57,9 @@ function SocketControl:setCallBack()
             	end
 
             	if message.action == "stone_added" then
-            		OC:addObject(message.x,message.y)
+            		MC:addObject(message.x,message.y)
             	elseif message.action == "stone_removed" then
-            		OC:removeObject(message.x,message.y)
+            		MC:removeObject(message.x,message.y)
             	end
 
             	local player = nil

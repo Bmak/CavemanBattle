@@ -7,7 +7,6 @@ local bullets = nil
 local allMovingObjects = nil
 local lastTime = nil
 local Stone = require("app.obj.Stone")
-local ObjectControl = require("app.ObjectControl")
 local F = require("app.F")
 
 
@@ -71,9 +70,9 @@ end
 function MovingControl:checkPickUpBullet(obj)
 	if obj.bulletsCount >= obj.maxBullets then return end
 
-	for k,weapon in pairs(ObjectControl.objects) do
+	for k,weapon in pairs(self.weapons) do
 		if F:hasCollided(obj.view,weapon.view) and obj.isDead == false then
-			table.remove(ObjectControl.objects,k)
+			table.remove(self.weapons,k)
 			obj:addBullet(3,weapon.view.x,weapon.view.y)
 			weapon:destroy()
 			return
@@ -81,11 +80,27 @@ function MovingControl:checkPickUpBullet(obj)
 	end
 end
 
+function MovingControl:addWeapon(x,y)
+	local stone = Stone:new()
+	stone:create(self.container)
+	if x and y then
+		stone.view.x = x
+		stone.view.y = y
+	else
+		stone.view.x = math.round(math.random(50, self.container.width-50))
+		stone.view.y = math.round(math.random(50, self.container.height-50))
+	end
+	stone.view.xScale = 0.3
+	stone.view.yScale = 0.3
+	transition.to( stone.view, {time=500,xScale=1.5,yScale=1.5,transition=easing.inOutBack} )
+	table.insert( self.weapons, stone )
+end
+
 function MovingControl:removeWeapon(x,y)
-	for k,wep in pairs(ObjectControl.objects) do
+	for k,wep in pairs(self.weapons) do
 		if wep.view.x == x and wep.view.y == y then
 			wep:destroy()
-			table.remove( ObjectControl.objects, k )
+			table.remove( self.weapons, k )
 			return
 		end
 	end
@@ -146,6 +161,11 @@ function MovingControl:destroy()
 	for i,bullet in pairs(self.bullets) do
 		bullet:destroy()
 	end
+	self.bullets = nil
+	for i,weapon in pairs(self.weapons) do
+		weapon:destroy()
+	end
+	self.weapons = nil
 end
 
 function MovingControl:getPlayer(id)

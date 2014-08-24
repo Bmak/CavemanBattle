@@ -3,7 +3,6 @@ local Player = {}
 
 local bar = require("app.BarControl")
 local MovingControl = require("app.MovingControl")
-local ObjectControl = require("app.ObjectControl")
 local F = require("app.F")
 local SC = require("app.SocketControl")
 local AnimBuild = require("app.animation.PlayerAnimBuilder")
@@ -288,7 +287,7 @@ end
 function Player:findWeapon()
 	local minDist = nil
 	local currentWeapon = nil
-	local weapons = ObjectControl.objects
+	local weapons = MovingControl.weapons
 	for k,wep in pairs(weapons) do
 		local d = F:getDistance(wep,self.view.x,self.view.y)
 		if minDist == nil or minDist > d then
