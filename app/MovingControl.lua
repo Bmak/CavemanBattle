@@ -81,6 +81,7 @@ function MovingControl:checkPickUpBullet(obj)
 end
 
 function MovingControl:addWeapon(x,y)
+	print( "ADD STONE" )
 	local stone = Stone:new()
 	stone:create(self.container)
 	if x and y then

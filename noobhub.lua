@@ -89,7 +89,7 @@ noobhub = {
 					self:reconnect()
 					return false;
 				end
-				local send_result, message, num_bytes = self.sock:send("#"..json.encode(message.message).."#")
+				local send_result, message, num_bytes = self.sock:send("#"..json.encode(message).."#")
 				-- local send_result, message, num_bytes = self.sock:send(json.encode(message))
 				if (send_result == nil) then
 					print("Noobhub publish error: "..message..'  sent '..num_bytes..' bytes');
@@ -144,7 +144,7 @@ noobhub = {
 					-- now, checking if a message is present in buffer...
 					while got_something_new do  --  this is for a case of several messages stocker in the buffer
 						local start = string.find(self.buffer,'#')
-						local finish = string.find(self.buffer,'#')
+						local finish = string.find(self.buffer,'&')
 						if (start and finish) then -- found a message!
 							local message = string.sub(self.buffer, start+1, finish-1)
 							self.buffer = string.sub(self.buffer, 1, start-1)  ..   string.sub(self.buffer, finish + 1 ) -- cutting our message from buffer

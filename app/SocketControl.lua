@@ -44,7 +44,7 @@ function SocketControl:setCallBack()
         channel = "ping-channel";
         callback = function(buffer) 
         	if buffer == nil then return end
-            -- print("message received  = "..json.encode(buffer));
+            -- print("parse  "..json.encode(buffer))
             
             for k,message in pairs(buffer) do
 
@@ -57,9 +57,9 @@ function SocketControl:setCallBack()
             	end
 
             	if message.action == "stone_added" then
-            		MC:addObject(message.x,message.y)
+            		MC:addWeapon(message.x,message.y)
             	elseif message.action == "stone_removed" then
-            		MC:removeObject(message.x,message.y)
+            		MC:removeWeapon(message.x,message.y)
             	end
 
             	local player = nil

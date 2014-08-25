@@ -178,8 +178,6 @@ function scene:destroy( event )
 
     movingControl:destroy()
     movingControl = nil
-    objControl:destroy()
-    objControl = nil
     tileMap:destroy()
     tileMap = nil
     barControl:destroy()
