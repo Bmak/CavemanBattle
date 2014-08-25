@@ -19,7 +19,7 @@ function SocketControl:connect(name)
 	self.uniq_id = system.getInfo('deviceID')
 	self.listener = display.newGroup( )
 
-	print("PLAYER NAME "..self.playerName)
+	pb("PLAYER NAME "..self.playerName)
 	self:setCallBack()
 	self:login()
 
@@ -29,11 +29,11 @@ function SocketControl:connect(name)
 	local function ping()
 		self:ping()
 	end
-	self.pingTimer = timer.performWithDelay( 50, ping, 0)
+	-- self.pingTimer = timer.performWithDelay( 50, ping, 0)
 end
 
 function SocketControl:login()
-	print("send login")
+	pb("send login")
 	if self.hub then
 		self.hub:publish({action="login",id=self.uniq_id,name=self.playerName,time=os.time()})
 	end
@@ -100,35 +100,35 @@ function SocketControl:setCallBack()
 end
 
 function SocketControl:move(px,py)
-	print("send move "..os.time())
+	pb("send move "..os.time())
 	if self.hub then
 		self.hub:publish({action="move",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
 	end
 end
 
 function SocketControl:throw(px,py)
-	print("send throw "..os.time())
+	pb("send throw "..os.time())
 	if self.hub then
 		self.hub:publish({action="throw",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
 	end
 end
 
 function SocketControl:dead(killer_id)
-	print("send dead "..os.time())
+	pb("send dead "..os.time())
 	if self.hub then
 		self.hub:publish({action="dead",id=self.uniq_id,killer=killer_id,time=os.time()})
 	end
 end
 
 function SocketControl:reborn(px,py)
-	print("send reborn "..os.time())
+	pb("send reborn "..os.time())
 	if self.hub then
 		self.hub:publish({action="reborn",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
 	end
 end
 
 function SocketControl:pick(px,py)
-	print("send pick "..os.time())
+	pb("send pick "..os.time())
 	if self.hub then
 		self.hub:publish({action="pick",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
 	end
@@ -142,8 +142,10 @@ function SocketControl:ping()
 end
 
 function SocketControl:disconnect()
-	print("disconnect")
-	timer.cancel( self.pingTimer )
+	pb("disconnect")
+	if self.pingTimer then
+		timer.cancel( self.pingTimer )
+	end
 	if self.hub then
 		self.hub:unsubscribe()
 	end

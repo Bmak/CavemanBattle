@@ -11,8 +11,14 @@ local player = require("app.obj.Player")
 local movingControl = require("app.MovingControl")
 local barControl = require("app.BarControl")
 local SC = require("app.SocketControl")
+local results = require("app.obj.ResultTable")
 
 local hunter = nil
+local gameTimer = nil
+local timerTxt = nil
+local timerData = nil
+
+local memTimer = nil
 
 -- Load scene with same root filename as this file
 local scene = composer.newScene(  )
@@ -21,34 +27,34 @@ local scene = composer.newScene(  )
 
 function scene:create( event )
     local sceneGroup = self.view
-    
+
 
     local uniq_id = system.getInfo('deviceID')
-    print("ID "..uniq_id)
+    pb("ID "..uniq_id)
 
-    print("TRY TO CONNECT")
+    pb("GAME TYPE "..composer.gameType)
+    if composer.gameType == "multi" then
+        pb("TRY TO CONNECT")
+        SC:connect(composer.player)
 
-    SC:connect(composer.player)
+        local function addP(e)
+            pb("ADD NEW PLAYER "..e.id)
+            local pl = player:new()
+            pl:create(tileMap.mapCont, "player", e.id)
+            movingControl:addPlayer(pl)
+            -- SC.listener:removeEventListener( "addNewPlayer", addP )
+            -- SC:reborn(hunter.view.x,hunter.view.y)
+            -- SC:move(hunter.targetX, hunter.targetY)
+        end
+        SC.listener:addEventListener( "addNewPlayer", addP )
 
-    local function addP(e)
-        print("ADD NEW PLAYER "..e.id)
-        local pl = player:new()
-        pl:create(tileMap.mapCont, "player", e.id)
-        movingControl:addPlayer(pl)
-        -- SC.listener:removeEventListener( "addNewPlayer", addP )
-        -- SC:reborn(hunter.view.x,hunter.view.y)
-        -- SC:move(hunter.targetX, hunter.targetY)
+        local function showMe(e)
+            SC:reborn(hunter.view.x,hunter.view.y)
+        end
+        SC.listener:addEventListener( "showMe", showMe )
     end
-    SC.listener:addEventListener( "addNewPlayer", addP )
-
-    local function showMe(e)
-        print("SHOW ME ")
-        SC:reborn(hunter.view.x,hunter.view.y)
-    end
-    SC.listener:addEventListener( "showMe", showMe )
-
-   
-    print( "CREATE SCENE" )
+    
+    pb( "CREATE SCENE" )
 
     tileMap:create(sceneGroup)
     movingControl:init(tileMap.mapCont)
@@ -61,14 +67,18 @@ function scene:create( event )
     barControl:create(sceneGroup)
 
     -- SC:login()
+    if composer.gameType == "single" then
+        for i=1,3 do
+            local duck = player:new()
+            duck:create(tileMap.mapCont, "bot", i)
+            duck:randomMove()
+            movingControl:addPlayer(duck)
+        end
+        movingControl:initWeapons()
 
-    -- for i=1,1 do
-    --     local duck = player:new()
-    --     duck:create(tileMap.mapCont, "bot")
-    --     duck:randomMove()
-    --     movingControl:addPlayer(duck)
-    -- end
-
+        self:setGameTime(10)
+    end
+    
 
     function moveTouch(event)
         self:onHunterMove(event)
@@ -79,14 +89,61 @@ function scene:create( event )
     tileMap.mapCont:addEventListener( "touch", moveTouch )
     Runtime:addEventListener( "enterFrame", onTick )
 
-    local function onStopWorld(e)
-        tileMap.mapCont:removeEventListener( "touch", moveTouch )
-        Runtime:removeEventListener( "enterFrame", onTick )
-    end
-    SC.listener:addEventListener( "worldStop", onStopWorld )
 
+    if composer.gameType == "multi" then
+        local function onStopWorld(e)
+            tileMap.mapCont:removeEventListener( "touch", moveTouch )
+            Runtime:removeEventListener( "enterFrame", onTick )
+        end
+        SC.listener:addEventListener( "worldStop", onStopWorld )
+    end
 
     self:onShowMem()
+end
+
+function scene:setGameTime(data)
+    self.timerData = data
+    local timeText = math.floor(self.timerData/60)..":"..self.timerData % 60
+    self.timerTxt = display.newText(timeText, 0, 0, native.systemFont, 30 )
+    self.timerTxt.x = display.pixelHeight - self.timerTxt.width
+    self.timerTxt.y = display.pixelWidth - self.timerTxt.height
+    self.timerTxt:setFillColor(1, 0, 0)
+    self.view:insert(self.timerTxt)
+
+    local function recountTimer()
+        self.timerData = self.timerData - 1
+        sec = self.timerData % 60
+        if sec < 10 then
+            sec = "0"..sec
+        end
+        local t = math.floor(self.timerData/60)..":"..sec
+        self.timerTxt.text = t
+
+        if self.timerData <= 0 and composer.gameType == "single" then
+            if self.gameTimer then
+                timer.cancel( self.gameTimer )
+            end
+            self:showGameResult()
+        end
+    end
+
+    self.gameTimer = timer.performWithDelay( 1000, recountTimer, 0)
+end
+
+function scene:showGameResult()
+    local data = {}
+
+    for k,pl in pairs(movingControl.players) do
+        local d = {}
+        d.kills = pl.kills
+        d.deaths = pl.deaths
+        d.name = pl.nick
+        table.insert( data, d )
+    end
+
+    results:show(data)
+    tileMap.mapCont:removeEventListener( "touch", moveTouch )
+    Runtime:removeEventListener( "enterFrame", onTick )
 end
 
 function scene:onShowMem()
@@ -113,7 +170,7 @@ function scene:onShowMem()
         text2.text = "texture: "..system.getInfo( "textureMemoryUsed" )*0.000001 .. " MB"
     end
 
-    timer.performWithDelay( 1000, showMem, 0 )
+    self.memTimer = timer.performWithDelay( 1000, showMem, 0 )
 end
 
 function scene:onHunterMove(event)
@@ -139,7 +196,7 @@ function scene:show( event )
         -- 
         -- INSERT code here to make the scene come alive
         -- e.g. start timers, begin animation, play audio, etc
-        print( "SHOW SCENE" )
+        pb( "SHOW SCENE" )
 
 
         
@@ -158,7 +215,7 @@ function scene:hide( event )
     elseif phase == "did" then
         -- Called when the scene is now off screen
 
-        print( "HIDE SCENE" )
+        pb( "HIDE SCENE" )
 
         tileMap.mapCont:removeEventListener( "touch", moveTouch )
         Runtime:removeEventListener( "enterFrame", onTick )
@@ -174,7 +231,7 @@ function scene:destroy( event )
     Runtime:removeEventListener( "enterFrame", onTick )
 
 
-    print( "DESTORY SCENE" )
+    pb( "DESTORY SCENE" )
 
     movingControl:destroy()
     movingControl = nil
@@ -184,6 +241,13 @@ function scene:destroy( event )
     barControl = nil
     hunter = nil
 
+    if self.memTimer then
+        timer.cancel( self.memTimer )
+    end
+    if self.gameTimer then
+        timer.cancel( self.gameTimer )
+    end
+    
 
     SC:disconnect()
     SC = nil

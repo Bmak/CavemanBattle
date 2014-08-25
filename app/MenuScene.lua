@@ -20,7 +20,7 @@ local function onSave()
 
     local path = system.pathForFile( "cavemaninfo.txt", system.DocumentsDirectory )
 
-    -- print("SAVE "..path)
+    -- pb("SAVE "..path)
 
     local file = io.open( path, "w" )
     file:write( saveData )
@@ -32,7 +32,7 @@ end
 local function onLoad(txt)
     local path = system.pathForFile( "cavemaninfo.txt", system.DocumentsDirectory )
 
-    -- print("LOAD "..path)
+    -- pb("LOAD "..path)
 
     local file = io.open( path, "r" )
     if file then
@@ -57,48 +57,69 @@ function scene:create( event )
    	bkg.y = display.contentCenterY
     sceneGroup:insert( bkg )
 
-    local nextSceneButton = display.newImage("i/btn1.png",0,0)
-    nextSceneButton.width = nextSceneButton.width*2
-    nextSceneButton.height = nextSceneButton.height*2
-    nextSceneButton.x = display.contentCenterX + (bkg.width - nextSceneButton.width)/2
-    nextSceneButton.y = display.contentCenterY + (bkg.height - nextSceneButton.height)/2 - 20
-    sceneGroup:insert( nextSceneButton )
+    local multiSceneBtn = display.newImage("i/multi.png",0,0)
+    multiSceneBtn.width = multiSceneBtn.width*3
+    multiSceneBtn.height = multiSceneBtn.height*3
+    multiSceneBtn.x = display.contentCenterX + (bkg.width - multiSceneBtn.width)/2
+    multiSceneBtn.y = display.contentCenterY + (bkg.height - multiSceneBtn.height)/2 - 20
+    sceneGroup:insert( multiSceneBtn )
 
-    function nextSceneButton:touch ( event )
+    local singleSceneBtn = display.newImage("i/single.png",0,0)
+    singleSceneBtn.width = singleSceneBtn.width*3
+    singleSceneBtn.height = singleSceneBtn.height*3
+    singleSceneBtn.x = display.contentCenterX + (bkg.width - singleSceneBtn.width)/2
+    singleSceneBtn.y = display.contentCenterY + (bkg.height - singleSceneBtn.height)/2 - 40 - multiSceneBtn.height
+    sceneGroup:insert( singleSceneBtn )
+
+    function goToGame ( event )
         local phase = event.phase
-        if "ended" == phase then
+        if "began" == phase then
+            if event.target == singleSceneBtn then
+                composer.gameType = "single"
+            elseif event.target == multiSceneBtn then
+                composer.gameType = "multi"
+            end
+
             composer.gotoScene( "app.GameScene", { effect = "fade", time = 300 } )
 
             onSave()
         end
     end
     -- add the touch event listener to the button
-    nextSceneButton:addEventListener( "touch", nextSceneButton )
+    multiSceneBtn:addEventListener( "touch", goToGame )
+    -- add the touch event listener to the button
+    singleSceneBtn:addEventListener( "touch", goToGame )
 
-    local titleText = display.newText( "Input your name:", display.contentCenterX, display.contentCenterY - 50, native.systemFont, 30 )
-    sceneGroup:insert(titleText)
+
+
+
+    
     local function textListener( event )
-        print(event.phase)
+        pb(event.phase)
         if ( event.phase == "began" ) then
             -- user begins editing text field
-            print( event.text )
+            pb( event.text )
         elseif ( event.phase == "ended" or event.phase == "submitted" ) then
             -- text field loses focus
             -- do something with nickTxt's text
-            print( event.text )
+            pb( event.text )
         elseif ( event.phase == "editing" ) then
-            print( event.newCharacters )
-            print( event.oldText )
-            print( event.startPosition )
-            print( event.text )
+            pb( event.newCharacters )
+            pb( event.oldText )
+            pb( event.startPosition )
+            pb( event.text )
             composer.player = event.text
         end
     end
     self.nickTxt = native.newTextField( display.contentCenterX, display.contentCenterY, 250, 70 )
+    self.nickTxt.x = bkg.x - bkg.width/2 + self.nickTxt.width/2 + 20
     self.nickTxt.text = "player"
     self.nickTxt:addEventListener( "userInput", textListener )
     composer.player = "player"
     sceneGroup:insert(self.nickTxt)
+    local titleText = display.newText( "Input your name:", display.contentCenterX, display.contentCenterY - 50, native.systemFont, 30 )
+    titleText.x = self.nickTxt.x
+    sceneGroup:insert(titleText)
 
     onLoad(self.nickTxt)
 

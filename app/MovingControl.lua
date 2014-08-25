@@ -8,6 +8,9 @@ local allMovingObjects = nil
 local lastTime = nil
 local Stone = require("app.obj.Stone")
 local F = require("app.F")
+local weapFlag = nil
+local weapResp = nil
+local weapCurrResp = nil
 
 
 function MovingControl:init(group)
@@ -18,6 +21,16 @@ function MovingControl:init(group)
 	self.bullets = {}
 	self.allMovingObjects = {}
 	self.lastTime = 0
+end
+
+function MovingControl:initWeapons()
+	self.weapFlag = true
+	self.weapResp = 10000
+	self.weapCurrResp = 10000
+
+	for i=1,10 do
+		self:addWeapon()
+	end
 end
 
 function MovingControl:tick(event)
@@ -51,6 +64,18 @@ function MovingControl:tick(event)
 		if obj.logout ~= nil and obj.logout == true then
 			table.remove( self.allMovingObjects, table.indexOf( self.allMovingObjects, obj) )
 		end
+		if self.weapFlag == true then
+			self:checkForAddWeapon(delta)
+		end
+	end
+end
+
+function MovingControl:checkForAddWeapon(delta)
+	if table.maxn( self.weapons ) > 20 then return end
+	self.weapCurrResp = self.weapCurrResp - delta
+	if self.weapCurrResp <= 0 then
+		self.weapCurrResp = self.weapResp
+		self:addWeapon()
 	end
 end
 
@@ -81,7 +106,6 @@ function MovingControl:checkPickUpBullet(obj)
 end
 
 function MovingControl:addWeapon(x,y)
-	print( "ADD STONE" )
 	local stone = Stone:new()
 	stone:create(self.container)
 	if x and y then

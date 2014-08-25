@@ -6,6 +6,7 @@ local MovingControl = require("app.MovingControl")
 local F = require("app.F")
 local SC = require("app.SocketControl")
 local AnimBuild = require("app.animation.PlayerAnimBuilder")
+local composer = require("composer")
 
 
 
@@ -38,22 +39,18 @@ function Player:new( ... )
 		nextAnimName = nil,
 		isBack = nil,
 		colors = nil,
-		logout = nil
+		logout = nil,
+		kills = nil,
+		deaths = nil,
+		nick = nil
 	}
 	self.__index = self
   	return setmetatable(params, self)
 end
 
-
-local function getSkin(stype)
-	local skin = display.newImage("i/skin_1.png")
-	-- if stype == "hero" then
-	-- 	skin = "i/skin_1.png"
-	-- else
-	-- 	local id = math.round(math.random(2,4))
-	-- 	skin = "i/mskin_"..id..".png"
-	-- end
-	return skin
+local function getBotName(id)
+	local names = {"IkillU","skaska","loser"}
+	return names[id]
 end
 
 function Player:create(group, type, id)
@@ -81,11 +78,19 @@ function Player:create(group, type, id)
 
 	self.colors = { math.random()*0.9,math.random()*0.9,math.random()*0.9 }
 
+	self.kills = 0
+	self.deaths = 0
+	self.nick = composer.player
 
 	self.isAnimating = false
 
 	if self.name ~= "player" then
 		self.colors = {1,1,1}
+		if self.name == "bot" then
+			self.nick = getBotName(self.id)
+			self.colors = { math.random()*0.9,math.random()*0.9,math.random()*0.9 }
+		end
+		
 		self:respawn()
 	end
 end
@@ -177,11 +182,15 @@ function Player:respawn(x,y)
 end
 
 function Player:play(name,back)
-	if self.currentAnim then
+	if name ~= "" then
 		local anim = self:getAnimByName(name,back)
 		-- if self.currentAnim.name ~= anim.name and self.currentAnim.isBack ~= anim.isBack then
 			if anim.playOnce == true then
-				self.nextAnimName = self.currentAnim.name
+				if self.currentAnim then
+					self.nextAnimName = self.currentAnim.name
+				else
+					self.nextAnimName = "move"
+				end
 			end
 			self:playAnimation(anim)
 		-- end
@@ -211,13 +220,14 @@ function Player:playAnimation(anim)
 	self:removeCurrentAnim()
 	self.currentAnim = anim
 	self.currentAnim.anim:setFillColor(self.colors[1],self.colors[2],self.colors[3])
-	print("animepta "..self.name)
-	print(self.view)
-	print(self.animContainer)
-	print(self.currentAnim)
-	print(self.currentAnim.anim)
-	print(self.currentAnim.anim.parent)
-	print(self.nextAnimName)
+	-- pb("animepta "..self.name)
+	-- pb(self.currentAnim.name)
+	-- pb(self.view)
+	-- pb(self.animContainer)
+	-- pb(self.currentAnim)
+	-- pb(self.currentAnim.anim)
+	-- pb(self.currentAnim.anim.parent)
+	-- pb(self.nextAnimName)
 	self.animContainer:insert(self.currentAnim.anim)
 	self.currentAnim.anim:play()
 	self.isAnimating = true
@@ -226,7 +236,6 @@ function Player:playAnimation(anim)
 		local function onEndAnim(event)
 			if event.phase == "loop" then
 				self.currentAnim.anim:removeEventListener( "sprite", onEndAnim )
-
 				if self.nextAnimName then
 					self:removeCurrentAnim()
 					self:play(self.nextAnimName,self.isBack)
@@ -240,11 +249,6 @@ end
 
 function Player:removeCurrentAnim()
 	if self.currentAnim ~= nil then
-		-- print("remove animepta")
-		-- print(self.view)
-		-- print(self.currentAnim)
-		-- print(self.currentAnim.anim)
-		-- print(self.currentAnim.anim.parent)
 		if self.currentAnim.anim.parent then
 			self.currentAnim.anim:removeSelf()
 		end
@@ -318,11 +322,10 @@ function Player:stopMoving()
 	self.vx = 0
 	self.vy = 0
 
+	self:play("stay",self.isBack)
 	if self.name == "bot" and self.isDead == false then
 		self:smartBotStrategy()
 	end
-
-	self:play("stay",self.isBack)
 
 	if self.tap ~= nil then
 		self.tap:removeSelf()
@@ -337,23 +340,22 @@ function Player:kill(bullet)
 	-- 	self:dead()
 	-- end
 
-	-- local kills = 0
-	-- if bullet.parent.name == "hero" then
-	-- 	kills = bar:getKills() + 1
-	-- 	bar:setKills(kills)
-	-- elseif self.name == "hero" then
-	-- 	kills = bar:getKills() - 1
-	-- 	bar:setKills(kills)
-	-- 	SC:dead()
-	-- end
+	self.deaths = self.deaths + 1
 
-	-- local kills = 0
-	if self.name == "player" or self.name == "bot" then
-		-- kills = bar:getKills() + 1
-		-- bar:setKills(kills)
+	if composer.gameType == "single" then
+		local killer = MovingControl:getPlayer(bullet.parent.id)
+		if killer then
+			killer.kills = killer.kills + 1
+		end
+	end
+
+	if self.name == "bot" then
+		if bullet.parent.name == "hero" then
+			local kills = bar:getKills() + 1
+			bar:setKills(kills)
+		end
+		self:dead()
 	elseif self.name == "hero" then
-		-- kills = bar:getKills() - 1
-		-- bar:setKills(kills)
 		SC:dead(bullet.parent.id)
 		self:dead()
 	end
