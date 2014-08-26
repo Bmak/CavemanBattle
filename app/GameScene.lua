@@ -52,6 +52,10 @@ function scene:create( event )
             SC:reborn(hunter.view.x,hunter.view.y)
         end
         SC.listener:addEventListener( "showMe", showMe )
+        local function setTime(e)
+            self:setGameTime(e.time)
+        end
+        SC.listener:addEventListener( "setTimeLeft", setTime )
     end
     
     pb( "CREATE SCENE" )
@@ -103,7 +107,7 @@ end
 
 function scene:setGameTime(data)
     self.timerData = data
-    local timeText = math.floor(self.timerData/60)..":"..self.timerData % 60
+    local timeText = math.floor(self.timerData/60)..":"..math.round(self.timerData % 60)
     self.timerTxt = display.newText(timeText, 0, 0, native.systemFont, 30 )
     self.timerTxt.x = display.pixelHeight - self.timerTxt.width
     self.timerTxt.y = display.pixelWidth - self.timerTxt.height

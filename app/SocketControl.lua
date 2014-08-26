@@ -29,7 +29,7 @@ function SocketControl:connect(name)
 	local function ping()
 		self:ping()
 	end
-	-- self.pingTimer = timer.performWithDelay( 50, ping, 0)
+	self.pingTimer = timer.performWithDelay( 50, ping, 0)
 end
 
 function SocketControl:login()
@@ -48,6 +48,9 @@ function SocketControl:setCallBack()
             
             for k,message in pairs(buffer) do
 
+            	if message.action == "time" then
+            		self.listener:dispatchEvent( {name="setTimeLeft", time=message.time_left} )
+            	end
 
             	if message.action == "result" then
             		results:show(message.data)
@@ -102,35 +105,35 @@ end
 function SocketControl:move(px,py)
 	pb("send move "..os.time())
 	if self.hub then
-		self.hub:publish({action="move",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
+		self.hub:publish({action="move",id=self.uniq_id,x=math.round(px),y=math.round(py)})
 	end
 end
 
 function SocketControl:throw(px,py)
 	pb("send throw "..os.time())
 	if self.hub then
-		self.hub:publish({action="throw",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
+		self.hub:publish({action="throw",id=self.uniq_id,x=math.round(px),y=math.round(py)})
 	end
 end
 
 function SocketControl:dead(killer_id)
 	pb("send dead "..os.time())
 	if self.hub then
-		self.hub:publish({action="dead",id=self.uniq_id,killer=killer_id,time=os.time()})
+		self.hub:publish({action="dead",id=self.uniq_id,killer=killer_id})
 	end
 end
 
 function SocketControl:reborn(px,py)
 	pb("send reborn "..os.time())
 	if self.hub then
-		self.hub:publish({action="reborn",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
+		self.hub:publish({action="reborn",id=self.uniq_id,x=math.round(px),y=math.round(py)})
 	end
 end
 
 function SocketControl:pick(px,py)
 	pb("send pick "..os.time())
 	if self.hub then
-		self.hub:publish({action="pick",id=self.uniq_id,x=math.round(px),y=math.round(py),time=os.time()})
+		self.hub:publish({action="pick",id=self.uniq_id,x=math.round(px),y=math.round(py)})
 	end
 end
 
