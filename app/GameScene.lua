@@ -80,7 +80,7 @@ function scene:create( event )
         end
         movingControl:initWeapons()
 
-        self:setGameTime(10)
+        self:setGameTime(15)
     end
     
 
@@ -107,7 +107,7 @@ end
 
 function scene:setGameTime(data)
     self.timerData = data
-    local timeText = math.floor(self.timerData/60)..":"..math.round(self.timerData % 60)
+    local timeText = math.floor(self.timerData/60)..":"..math.floor(self.timerData % 60)
     self.timerTxt = display.newText(timeText, 0, 0, native.systemFont, 30 )
     self.timerTxt.x = display.pixelHeight - self.timerTxt.width
     self.timerTxt.y = display.pixelWidth - self.timerTxt.height
@@ -116,18 +116,20 @@ function scene:setGameTime(data)
 
     local function recountTimer()
         self.timerData = self.timerData - 1
-        sec = self.timerData % 60
+        sec = math.floor(self.timerData % 60)
         if sec < 10 then
             sec = "0"..sec
         end
         local t = math.floor(self.timerData/60)..":"..sec
         self.timerTxt.text = t
 
-        if self.timerData <= 0 and composer.gameType == "single" then
+        if self.timerData <= 0 then
             if self.gameTimer then
                 timer.cancel( self.gameTimer )
             end
-            self:showGameResult()
+            if composer.gameType == "single" then
+                self:showGameResult()
+            end
         end
     end
 
