@@ -49,7 +49,7 @@ function Player:new( ... )
 end
 
 local function getBotName(id)
-	local names = {"IkillU","skaska","loser"}
+	local names = {"IkillU","skaska","loser","yohoho","shpuntik"}
 	return names[id]
 end
 
@@ -254,6 +254,12 @@ function Player:removeCurrentAnim()
 		end
 		
 		self.currentAnim = nil
+	end
+end
+
+function Player:stopAnim()
+	if self.currentAnim ~= nil then
+		self.currentAnim.anim:pause()
 	end
 end
 

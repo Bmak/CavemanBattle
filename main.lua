@@ -12,8 +12,8 @@ local composer = require "composer"
 
 composer.recycleOnSceneChange = true
 
--- load scenetemplate.lua
-composer.gotoScene( "app.MenuScene" )
+xK = display.pixelHeight/1024
+-- yK = display.pixelWidth/768
 
 local flag = true
 -- flag = false
@@ -23,6 +23,11 @@ pb = function (mess)
 	end
 end
 
+composer.gotoScene( "app.MenuScene" )
+
+-- pb("window options "..xK.."/"..yK)
 pb('```````````````````````````````````````````````````````')
 
 pb("SYSTEM "..system.getInfo('platformName'))
+
+

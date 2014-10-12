@@ -46,30 +46,50 @@ local function onLoad(txt)
     txt.text = composer.player
 end
 
+local Anim = require("app.animation.AnimItem")
 
 function scene:create( event )
+
+    pb("CREATE MENU SCENE")
+
     local sceneGroup = self.view
 
-    local bkg = display.newImage( "i/bkg.png", 0, 0 )
-    bkg.width = 960
-    bkg.height = 540
+    local bkg = display.newGroup()
+    -- bkg.width = display.pixelHeight
+    -- bkg.height = display.pixelWidth
    	bkg.x = display.contentCenterX
    	bkg.y = display.contentCenterY
     sceneGroup:insert( bkg )
 
-    local multiSceneBtn = display.newImage("i/multi.png",0,0)
-    multiSceneBtn.width = multiSceneBtn.width*3
-    multiSceneBtn.height = multiSceneBtn.height*3
-    multiSceneBtn.x = display.contentCenterX + (bkg.width - multiSceneBtn.width)/2
-    multiSceneBtn.y = display.contentCenterY + (bkg.height - multiSceneBtn.height)/2 - 20
-    sceneGroup:insert( multiSceneBtn )
+    local bkgAnim = Anim:new( )
+    local options = nil
+    options = {
+        back = false,
+        frames = 30,
+        w = 900,
+        h = 690,
+        img = "i/anim/menu_sprite.png",
+        cw = 5400 ,
+        ch = 3450,
+        scale = 1.0
+    }
+    bkgAnim:create("bkg",options,0,false,1500)
+    bkgAnim.anim.xScale = display.pixelHeight/bkgAnim.anim.width
+    bkgAnim.anim.yScale = display.pixelWidth/bkgAnim.anim.height
+    bkg:insert(bkgAnim.anim)
+    bkgAnim.anim:play()
+    sceneGroup:insert( bkg )
 
     local singleSceneBtn = display.newImage("i/single.png",0,0)
-    singleSceneBtn.width = singleSceneBtn.width*3
-    singleSceneBtn.height = singleSceneBtn.height*3
-    singleSceneBtn.x = display.contentCenterX + (bkg.width - singleSceneBtn.width)/2
-    singleSceneBtn.y = display.contentCenterY + (bkg.height - singleSceneBtn.height)/2 - 40 - multiSceneBtn.height
+    singleSceneBtn.x = singleSceneBtn.width/2 + 10
+    singleSceneBtn.y = display.pixelWidth - singleSceneBtn.height - 40
     sceneGroup:insert( singleSceneBtn )
+
+    local multiSceneBtn = display.newImage("i/multi.png",0,0)
+    multiSceneBtn.x = multiSceneBtn.width/2 + 15
+    multiSceneBtn.y = display.pixelWidth - multiSceneBtn.height/2
+    sceneGroup:insert( multiSceneBtn )
+    
 
     function goToGame ( event )
         local phase = event.phase
@@ -80,7 +100,7 @@ function scene:create( event )
                 composer.gameType = "multi"
             end
 
-            composer.gotoScene( "app.GameScene", { effect = "fade", time = 300 } )
+            composer.gotoScene( "app.GameScene", { effect = "crossFade", time = 500 } )
 
             onSave()
         end
@@ -89,9 +109,6 @@ function scene:create( event )
     multiSceneBtn:addEventListener( "touch", goToGame )
     -- add the touch event listener to the button
     singleSceneBtn:addEventListener( "touch", goToGame )
-
-
-
 
     
     local function textListener( event )
@@ -111,15 +128,20 @@ function scene:create( event )
             composer.player = event.text
         end
     end
-    self.nickTxt = native.newTextField( display.contentCenterX, display.contentCenterY, 250, 70 )
-    self.nickTxt.x = bkg.x - bkg.width/2 + self.nickTxt.width/2 + 20
+    self.nickTxt = native.newTextField( display.contentCenterX, display.contentCenterY+10, 250, 70 )
+    self.nickTxt.x = display.contentCenterX
+    self.nickTxt.hasBackground = false
     self.nickTxt.text = "player"
     self.nickTxt:addEventListener( "userInput", textListener )
     composer.player = "player"
+    local tfbkg = display.newImage("i/nickname.png",0,0)
+    tfbkg.x = display.contentCenterX + 23
+    tfbkg.y = display.contentCenterY-12
+    sceneGroup:insert(tfbkg)
     sceneGroup:insert(self.nickTxt)
-    local titleText = display.newText( "Input your name:", display.contentCenterX, display.contentCenterY - 50, native.systemFont, 30 )
-    titleText.x = self.nickTxt.x
-    sceneGroup:insert(titleText)
+    -- local titleText = display.newText( "Input your name:", display.contentCenterX, display.contentCenterY - 50, native.systemFont, 30 )
+    -- titleText.x = self.nickTxt.x
+    -- sceneGroup:insert(titleText)
 
     onLoad(self.nickTxt)
 

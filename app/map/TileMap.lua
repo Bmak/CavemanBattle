@@ -22,7 +22,7 @@ function TileMap:create(group)
 		table.insert( mapData, mtrx )
 	end
 
-	self:createByMap(mapData,9,9)
+	self:createByMap(mapData,15,15)
 	self:addRandomObjects()
 end
 
@@ -40,6 +40,7 @@ function TileMap:createByMap(map, width, height)
 		end
 		table.insert( self.tiles, subtiles )
 	end
+
 	self.container:insert(self.mapCont)
 end
 

@@ -1,4 +1,9 @@
+
+
+
 local Stone = {}
+
+local Splash = require("app.obj.StoneSplash")
 
 function Stone:new()
 	local params = {
@@ -23,9 +28,13 @@ function Stone:new()
   	return setmetatable(params, self)
 end
 
-function Stone:create(group)
+function Stone:create(group,weaponFlag)
 	self.container = group
-	self.view = display.newImage("i/stone.png",0,0)
+	if weaponFlag~=nil then
+		self.view = display.newImage("i/stone_bunch.png",0,0)
+	else
+		self.view = display.newImage("i/stone.png",0,0)
+	end
 	self.container:insert(self.view)
 
 	self.speed = 15
@@ -43,7 +52,8 @@ end
 function Stone:tick(event)
 	if self.pauseMove then return end
 
-	self.angle = self.angle + 5
+	-- self.view.angle = self.view.angle + 5
+	self.view.rotation = self.view.rotation + 20
 end
 
 function Stone:stopMoving()
@@ -54,6 +64,8 @@ function Stone:stopMoving()
 	self.isDead = true
 	-- TODO removeStone
 	local function complete( ... )
+		local spl = Splash:new()
+		spl:create(self.container,self.view.x,self.view.y)
 		self.view:removeSelf( )
 	end
 	transition.to( self.view, {time=1000,alpha=0,onComplete=complete()} )

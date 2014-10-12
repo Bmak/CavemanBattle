@@ -5,7 +5,7 @@ settings = {
 	
 	orientation = {
 		default = "landscapeRight",
-		supported = { "landscapeRight", }
+		supported = { "landscapeRight","landscapeLeft" }
 	},
 	
 	iphone = {
@@ -27,6 +27,12 @@ settings = {
                 }
             }
             --]]
+
+            UIAppFonts =
+            {
+                "BARIOL.otf",
+                "ARIAL.ttf"
+            }
 		}
 	},
 	
@@ -34,7 +40,7 @@ settings = {
 	-- Android permissions
 
 	androidPermissions = {
-  		"android.permission.INTERNET",
+  		"android.permission.INTERNET", "android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.READ_EXTERNAL_STORAGE"
   	},
   	
 	

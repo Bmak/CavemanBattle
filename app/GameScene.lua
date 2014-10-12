@@ -72,7 +72,7 @@ function scene:create( event )
 
     -- SC:login()
     if composer.gameType == "single" then
-        for i=1,3 do
+        for i=1,5 do
             local duck = player:new()
             duck:create(tileMap.mapCont, "bot", i)
             duck:randomMove()
@@ -80,7 +80,7 @@ function scene:create( event )
         end
         movingControl:initWeapons()
 
-        self:setGameTime(15)
+        self:setGameTime(60)
     end
     
 
@@ -102,15 +102,15 @@ function scene:create( event )
         SC.listener:addEventListener( "worldStop", onStopWorld )
     end
 
-    self:onShowMem()
+    -- self:onShowMem()
 end
 
 function scene:setGameTime(data)
     self.timerData = data
-    local timeText = math.floor(self.timerData/60)..":"..math.floor(self.timerData % 60)
-    self.timerTxt = display.newText(timeText, 0, 0, native.systemFont, 30 )
-    self.timerTxt.x = display.pixelHeight - self.timerTxt.width
-    self.timerTxt.y = display.pixelWidth - self.timerTxt.height
+    local timeText = "Round time: "..math.floor(self.timerData/60)..":"..math.floor(self.timerData % 60)
+    self.timerTxt = display.newText(timeText, 0, 0, "ARIAL", 30 )
+    self.timerTxt.x = self.timerTxt.width/2  + 20  
+    self.timerTxt.y = display.pixelWidth - self.timerTxt.height/2
     self.timerTxt:setFillColor(1, 0, 0)
     self.view:insert(self.timerTxt)
 
@@ -120,7 +120,7 @@ function scene:setGameTime(data)
         if sec < 10 then
             sec = "0"..sec
         end
-        local t = math.floor(self.timerData/60)..":"..sec
+        local t = "Round time: "..math.floor(self.timerData/60)..":"..sec
         self.timerTxt.text = t
 
         if self.timerData <= 0 then
@@ -144,6 +144,7 @@ function scene:showGameResult()
         d.kills = pl.kills
         d.deaths = pl.deaths
         d.name = pl.nick
+        pl:stopAnim()
         table.insert( data, d )
     end
 

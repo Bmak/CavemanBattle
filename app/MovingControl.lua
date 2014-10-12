@@ -28,7 +28,7 @@ function MovingControl:initWeapons()
 	self.weapResp = 10000
 	self.weapCurrResp = 10000
 
-	for i=1,10 do
+	for i=1,15 do
 		self:addWeapon()
 	end
 end
@@ -107,7 +107,7 @@ end
 
 function MovingControl:addWeapon(x,y)
 	local stone = Stone:new()
-	stone:create(self.container)
+	stone:create(self.container,true)
 	if x and y then
 		stone.view.x = x
 		stone.view.y = y

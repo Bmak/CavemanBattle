@@ -14,15 +14,17 @@ function AnimItem:new()
   	return setmetatable(params, self)
 end
 
-function AnimItem:create(name,options,priority,playOnce)
+function AnimItem:create(name,options,priority,playOnce,ftime)
 	self.name = name
 	self.priority = priority
 	self.playOnce = playOnce
     self.isBack = options.back
-
+    local t = 500
+    if ftime ~= nil then t = ftime end
+ 
 	local seqData_f = 
 	{
-        { name="running", start=1, count=options.frames, time=500 }
+        { name="running", start=1, count=options.frames, time=t }
     }
     local sheetData_f = {
     	width=options.w,

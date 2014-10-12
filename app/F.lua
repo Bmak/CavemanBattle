@@ -26,3 +26,8 @@ function F:hasCollided( obj1, obj2 )
 end
 
 return F
+
+
+
+
+-- ((x/2)(x/2) + ((y+1)/2)((y+1)/2)sqrt((abs(y+1))/(y+1))-1)((x/2)(x/2) + ((y-1)/2)((y-1)/2)sqrt((abs(-y+1))/(-y+1))-1)(sqrt((abs(3-abs(x-5)))/(3-abs(x-5)))-y)(-sqrt((abs(3-abs(x-5))))-y)(((x-9)/1.5)((x-9)/1.5)sqrt(abs(x+1)/(x+1))+(y/1.5)(y/1.5)-1)(0.00001sqrt((abs(0.25-abs(x-10.25)))/(0.25-abs(x-10.25)))-y) = 0
