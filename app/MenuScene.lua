@@ -5,8 +5,9 @@
 ---------------------------------------------------------------------------------
 
 local composer = require( "composer" )
-local bezier = require("app.bezier")
-local stone = require("app.obj.Stone")
+-- local bezier = require("app.bezier")
+-- local stone = require("app.obj.Stone")
+local Window = require("app.Window")
 
 local nickTxt = nil
 
@@ -96,11 +97,13 @@ function scene:create( event )
         if "began" == phase then
             if event.target == singleSceneBtn then
                 composer.gameType = "single"
+                composer.gotoScene( "app.GameScene", { effect = "crossFade", time = 500 } )
             elseif event.target == multiSceneBtn then
-                composer.gameType = "multi"
+                -- composer.gameType = "multi"
+                Window:showInfoWindow("Coming soon...")
             end
 
-            composer.gotoScene( "app.GameScene", { effect = "crossFade", time = 500 } )
+            -- composer.gotoScene( "app.GameScene", { effect = "crossFade", time = 500 } )
 
             onSave()
         end
@@ -111,39 +114,7 @@ function scene:create( event )
     singleSceneBtn:addEventListener( "touch", goToGame )
 
     
-    local function textListener( event )
-        pb(event.phase)
-        if ( event.phase == "began" ) then
-            -- user begins editing text field
-            pb( event.text )
-        elseif ( event.phase == "ended" or event.phase == "submitted" ) then
-            -- text field loses focus
-            -- do something with nickTxt's text
-            pb( event.text )
-        elseif ( event.phase == "editing" ) then
-            pb( event.newCharacters )
-            pb( event.oldText )
-            pb( event.startPosition )
-            pb( event.text )
-            composer.player = event.text
-        end
-    end
-    self.nickTxt = native.newTextField( display.contentCenterX, display.contentCenterY+10, 250, 70 )
-    self.nickTxt.x = display.contentCenterX
-    self.nickTxt.hasBackground = false
-    self.nickTxt.text = "player"
-    self.nickTxt:addEventListener( "userInput", textListener )
-    composer.player = "player"
-    local tfbkg = display.newImage("i/nickname.png",0,0)
-    tfbkg.x = display.contentCenterX + 23
-    tfbkg.y = display.contentCenterY-12
-    sceneGroup:insert(tfbkg)
-    sceneGroup:insert(self.nickTxt)
-    -- local titleText = display.newText( "Input your name:", display.contentCenterX, display.contentCenterY - 50, native.systemFont, 30 )
-    -- titleText.x = self.nickTxt.x
-    -- sceneGroup:insert(titleText)
-
-    onLoad(self.nickTxt)
+    
 
 
 
@@ -182,12 +153,39 @@ function scene:show( event )
         -- Called when the scene is still off screen and is about to move on screen
     elseif phase == "did" then
 
-        -- Called when the scene is now on screen
-        -- 
-        -- INSERT code here to make the scene come alive
-        -- e.g. start timers, begin animation, play audio, etc
-        
-        -- we obtain the object by id from the scene's object hierarchy
+        local function textListener( event )
+        pb(event.phase)
+        if ( event.phase == "began" ) then
+            -- user begins editing text field
+            pb( event.text )
+        elseif ( event.phase == "ended" or event.phase == "submitted" ) then
+            -- text field loses focus
+            -- do something with nickTxt's text
+            pb( event.text )
+        elseif ( event.phase == "editing" ) then
+            pb( event.newCharacters )
+            pb( event.oldText )
+            pb( event.startPosition )
+            pb( event.text )
+            composer.player = event.text
+        end
+    end
+    self.nickTxt = native.newTextField( display.contentCenterX, display.contentCenterY+10, 250, 70 )
+    self.nickTxt.x = display.contentCenterX
+    self.nickTxt.hasBackground = false
+    self.nickTxt.text = "player"
+    self.nickTxt:addEventListener( "userInput", textListener )
+    composer.player = "player"
+    local tfbkg = display.newImage("i/nickname.png",0,0)
+    tfbkg.x = display.contentCenterX + 23
+    tfbkg.y = display.contentCenterY-12
+    sceneGroup:insert(tfbkg)
+    sceneGroup:insert(self.nickTxt)
+    -- local titleText = display.newText( "Input your name:", display.contentCenterX, display.contentCenterY - 50, native.systemFont, 30 )
+    -- titleText.x = self.nickTxt.x
+    -- sceneGroup:insert(titleText)
+
+    onLoad(self.nickTxt)
         
         
     end 

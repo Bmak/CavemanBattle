@@ -13,6 +13,7 @@ local barControl = require("app.BarControl")
 local SC = require("app.SocketControl")
 local results = require("app.obj.ResultTable")
 
+
 local hunter = nil
 local gameTimer = nil
 local timerTxt = nil

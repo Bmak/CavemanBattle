@@ -25,10 +25,10 @@ end
 
 function MovingControl:initWeapons()
 	self.weapFlag = true
-	self.weapResp = 10000
-	self.weapCurrResp = 10000
+	self.weapResp = 20000
+	self.weapCurrResp = 20000
 
-	for i=1,15 do
+	for i=1,12 do
 		self:addWeapon()
 	end
 end
@@ -71,7 +71,7 @@ function MovingControl:tick(event)
 end
 
 function MovingControl:checkForAddWeapon(delta)
-	if table.maxn( self.weapons ) > 20 then return end
+	if table.maxn( self.weapons ) > 12 then return end
 	self.weapCurrResp = self.weapCurrResp - delta
 	if self.weapCurrResp <= 0 then
 		self.weapCurrResp = self.weapResp
