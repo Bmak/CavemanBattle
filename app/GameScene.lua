@@ -66,6 +66,7 @@ function scene:create( event )
 
     hunter = player:new()
     hunter:create(tileMap.mapCont, "hero", system.getInfo('deviceID'))
+    -- hunter:create(sceneGroup, "hero", system.getInfo('deviceID'))
     tileMap:setHero(hunter)
     movingControl:addPlayer(hunter)
 
@@ -91,8 +92,13 @@ function scene:create( event )
     function onTick(event)
         self:worldTick(event)
     end
+    function onAccel(event)
+        self:onAccelerate(event)
+    end
     tileMap.mapCont:addEventListener( "touch", moveTouch )
     Runtime:addEventListener( "enterFrame", onTick )
+    system.setAccelerometerInterval( 50 )
+    Runtime:addEventListener("accelerometer", onAccel )
 
 
     if composer.gameType == "multi" then
@@ -154,31 +160,36 @@ function scene:showGameResult()
     Runtime:removeEventListener( "enterFrame", onTick )
 end
 
+local text = nil
+local text2 = nil
 function scene:onShowMem()
     local sceneGroup = self.view
-    local text = display.newText( "mem: "..collectgarbage( "count" )/1000 .. " MB", 0, 0, native.systemFont, 20 )
-    local text2 = display.newText( "texture: "..system.getInfo( "textureMemoryUsed" )*0.000001 .. " MB", 0, 0, native.systemFont, 20 )
-    text.anchorX = 0
-    text.anchorY = 0
-    text.x = 10
-    text.y = display.pixelWidth - 50
-    text2.anchorX = 0
-    text2.anchorY = 0
-    text2.x = 10
-    text2.y = display.pixelWidth - 25
+    self.text = display.newText( "mem: "..collectgarbage( "count" )/1000 .. " MB", 0, 0, native.systemFont, 20 )
+    self.text2 = display.newText( "texture: "..system.getInfo( "textureMemoryUsed" )*0.000001 .. " MB", 0, 0, native.systemFont, 20 )
+    self.text.anchorX = 0
+    self.text.anchorY = 0
+    self.text.x = 10
+    self.text.y = display.pixelWidth - 50
+    self.text2.anchorX = 0
+    self.text2.anchorY = 0
+    self.text2.x = 10
+    self.text2.y = display.pixelWidth - 25
 
-    text:setFillColor(0, 0, 0)
-    text2:setFillColor(0, 0, 0)
-    sceneGroup:insert(text)
-    sceneGroup:insert(text2)
+    self.text:setFillColor(1, 0, 0)
+    self.text2:setFillColor(1, 0, 0)
+
+    -- text:setFillColor(0, 0, 0)
+    -- text2:setFillColor(0, 0, 0)
+    sceneGroup:insert(self.text)
+    sceneGroup:insert(self.text2)
 
     local function showMem()
         collectgarbage()
-        text.text = "mem: "..collectgarbage( "count" )/1000 .. " MB"
-        text2.text = "texture: "..system.getInfo( "textureMemoryUsed" )*0.000001 .. " MB"
+        self.text.text = "mem: "..collectgarbage( "count" )/1000 .. " MB"
+        self.text2.text = "texture: "..system.getInfo( "textureMemoryUsed" )*0.000001 .. " MB"
     end
 
-    self.memTimer = timer.performWithDelay( 1000, showMem, 0 )
+    -- self.memTimer = timer.performWithDelay( 1000, showMem, 0 )
 end
 
 function scene:onHunterMove(event)
@@ -186,6 +197,13 @@ function scene:onHunterMove(event)
     if event.phase == "began" then
 		hunter:move(event.x - tileMap.mapCont.x,event.y - tileMap.mapCont.y)
 	end
+end
+
+function scene:onAccelerate(event)
+    -- self.text.text = event.xGravity
+    -- self.text2.text = event.yGravity
+    -- print(event.xGravity + hunter.view.x, event.yGravity*-1 + hunter.view.y)
+    hunter:move(event.yGravity*-10 + hunter.view.x, event.xGravity*-10 + hunter.view.y)
 end
 
 function scene:worldTick( event )

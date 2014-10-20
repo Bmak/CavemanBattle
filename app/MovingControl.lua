@@ -70,6 +70,7 @@ function MovingControl:tick(event)
 	end
 end
 
+
 function MovingControl:checkForAddWeapon(delta)
 	if table.maxn( self.weapons ) > 12 then return end
 	self.weapCurrResp = self.weapCurrResp - delta

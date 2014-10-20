@@ -392,15 +392,15 @@ function Player:move(x,y,action)
 		SC:move(x,y)
 	end
 
-	if self.name == "hero" then
-		if self.tap ~= nil then
-			self.tap:removeSelf()
-		end
-		self.tap = display.newImage("i/tap.png",x,y)
-		self.tap.alpha = 0.7
-		self.container:insert(self.tap)
-		self.view:toFront()
-	end
+	-- if self.name == "hero" then
+	-- 	if self.tap ~= nil then
+	-- 		self.tap:removeSelf()
+	-- 	end
+	-- 	self.tap = display.newImage("i/tap.png",x,y)
+	-- 	self.tap.alpha = 0.7
+	-- 	self.container:insert(self.tap)
+	-- 	self.view:toFront()
+	-- end
 
 	self.pauseMove = false
 	self.targetX = x

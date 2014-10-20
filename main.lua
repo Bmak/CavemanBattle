@@ -15,8 +15,8 @@ composer.recycleOnSceneChange = true
 xK = display.pixelHeight/1024
 -- yK = display.pixelWidth/768
 
-local flag = true
--- flag = false
+-- local flag = true
+flag = false
 pb = function (mess)
 	if flag then
 		print(mess)
