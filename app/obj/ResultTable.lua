@@ -25,8 +25,8 @@ function ResultTable:show(data)
 	        loop = 1
 	    }
 	    window:create("results",options,0,false,1200)
-	    -- bkgAnim.anim.xScale = display.pixelHeight/bkgAnim.anim.width
-	    -- bkgAnim.anim.yScale = display.pixelWidth/bkgAnim.anim.height
+	    -- bkgAnim.anim.xScale = 2
+	    -- bkgAnim.anim.yScale = 2
 	    window.anim:play()
 	    self.group:insert( window.anim )
 
@@ -195,7 +195,8 @@ function ResultTable:show(data)
 
  --    self.group.xScale = display.pixelHeight/self.group.width - 0.1
  --    self.group.yScale = display.pixelWidth/self.group.height - 0.1
-
+ 	self.group.xScale = 2
+    self.group.yScale = 2
     self.group.x = display.contentCenterX
 	self.group.y = display.contentCenterY
 

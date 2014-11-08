@@ -186,8 +186,8 @@ function scene:show( event )
             loop = 1
         }
         titleAnim:create("title",options,0,false,1500)
-        titleAnim.anim.xScale = 2
-        titleAnim.anim.yScale = 2
+        titleAnim.anim.xScale = 4
+        titleAnim.anim.yScale = 4
         titleAnim.anim:play()
         titleAnim.anim.x = display.contentCenterX
         titleAnim.anim.y = display.contentCenterY
@@ -199,10 +199,10 @@ function scene:show( event )
                 titleAnim.anim:pause()
 
 
-                local txtPlay = display.newText( "PLAY", 0, 0, STONE, 50 )
+                local txtPlay = display.newText( "PLAY", 0, 0, STONE, 100 )
                 txtPlay:setFillColor( black )
-                txtPlay.x = display.contentCenterX - 20
-                txtPlay.y = display.contentCenterY + 35
+                txtPlay.x = display.contentCenterX - 25
+                txtPlay.y = display.contentCenterY + 60
                 sceneGroup:insert( txtPlay )
 
                 titleAnim.anim:addEventListener( "touch", goToGame )

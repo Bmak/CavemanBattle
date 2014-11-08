@@ -82,7 +82,7 @@ function scene:create( event )
         end
         movingControl:initWeapons()
 
-        self:setGameTime(3)
+        self:setGameTime(90)
     end
     
 
