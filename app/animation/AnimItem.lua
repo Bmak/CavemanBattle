@@ -21,10 +21,14 @@ function AnimItem:create(name,options,priority,playOnce,ftime)
     self.isBack = options.back
     local t = 500
     if ftime ~= nil then t = ftime end
+    local loop = 0
+    if options.loop ~= nil then
+        loop = options.loop
+    end
  
 	local seqData_f = 
 	{
-        { name="running", start=1, count=options.frames, time=t }
+        { name="running", start=1, count=options.frames, time=t, loopCount=loop }
     }
     local sheetData_f = {
     	width=options.w,

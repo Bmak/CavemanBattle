@@ -32,7 +32,7 @@ function TileMap:createByMap(map, width, height)
 	for i=1,width do
 		local subtiles = {}
 		for j=1,height do
-			local tile = display.newImage("i/ground.png",0,0)
+			local tile = display.newImage("i/ground1.png",0,0)
 			tile.x = tile.width*i - tile.width/2
 			tile.y = tile.height*j - tile.height/2
 			table.insert( subtiles, tile )
@@ -50,7 +50,7 @@ function TileMap:addRandomObjects()
 	local maxX = self.container.width - 50
 	local maxY = self.container.height - 50
 
-	for i=1,20 do
+	for i=1,30 do
 		local dot = display.newImage("i/dot.png",0,0)
 		dot.x = math.random(50,maxX)
 		dot.y = math.random(50,maxY)
@@ -58,12 +58,12 @@ function TileMap:addRandomObjects()
 		self.mapCont:insert(dot)
 	end
 
-	for i=1,1 do
+	for i=1,3 do
 		local pool = display.newImage("i/pool.png",0,0)
 		pool.x = self.container.width/2
 		pool.y = self.container.height/2
-		-- pool.x = math.random(250,maxX-200)
-		-- pool.y = math.random(250,maxY-200)
+		pool.x = math.random(250,maxX-200)
+		pool.y = math.random(250,maxY-200)
 		table.insert( self.randomObjects, pool )
 		self.mapCont:insert(pool)
 	end

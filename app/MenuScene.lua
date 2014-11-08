@@ -44,7 +44,9 @@ local function onLoad(txt)
     else
         onSave()
     end
-    txt.text = composer.player
+    if txt ~= nil then
+        txt.text = composer.player
+    end
 end
 
 local Anim = require("app.animation.AnimItem")
@@ -70,7 +72,7 @@ function scene:create( event )
         w = 900,
         h = 690,
         img = "i/anim/menu_sprite.png",
-        cw = 5400 ,
+        cw = 5400,
         ch = 3450,
         scale = 1.0
     }
@@ -81,37 +83,34 @@ function scene:create( event )
     bkgAnim.anim:play()
     sceneGroup:insert( bkg )
 
-    local singleSceneBtn = display.newImage("i/single.png",0,0)
-    singleSceneBtn.x = singleSceneBtn.width/2 + 10
-    singleSceneBtn.y = display.pixelWidth - singleSceneBtn.height - 40
-    sceneGroup:insert( singleSceneBtn )
+    -- local singleSceneBtn = display.newImage("i/single.png",0,0)
+    -- singleSceneBtn.x = singleSceneBtn.width/2 + 10
+    -- singleSceneBtn.y = display.pixelWidth - singleSceneBtn.height - 40
+    -- sceneGroup:insert( singleSceneBtn )
 
-    local multiSceneBtn = display.newImage("i/multi.png",0,0)
-    multiSceneBtn.x = multiSceneBtn.width/2 + 15
-    multiSceneBtn.y = display.pixelWidth - multiSceneBtn.height/2
-    sceneGroup:insert( multiSceneBtn )
+    -- local multiSceneBtn = display.newImage("i/multi.png",0,0)
+    -- multiSceneBtn.x = multiSceneBtn.width/2 + 15
+    -- multiSceneBtn.y = display.pixelWidth - multiSceneBtn.height/2
+    -- sceneGroup:insert( multiSceneBtn )
     
 
     function goToGame ( event )
         local phase = event.phase
         if "began" == phase then
-            if event.target == singleSceneBtn then
+            -- if event.target == singleSceneBtn then
                 composer.gameType = "single"
                 composer.gotoScene( "app.GameScene", { effect = "crossFade", time = 500 } )
-            elseif event.target == multiSceneBtn then
+            -- elseif event.target == multiSceneBtn then
                 -- composer.gameType = "multi"
-                Window:showInfoWindow("Coming soon...")
-            end
+                -- Window:showInfoWindow("Coming soon...")
+            -- end
 
-            -- composer.gotoScene( "app.GameScene", { effect = "crossFade", time = 500 } )
 
-            onSave()
+            -- onSave()
         end
     end
-    -- add the touch event listener to the button
-    multiSceneBtn:addEventListener( "touch", goToGame )
-    -- add the touch event listener to the button
-    singleSceneBtn:addEventListener( "touch", goToGame )
+    -- multiSceneBtn:addEventListener( "touch", goToGame )
+    -- singleSceneBtn:addEventListener( "touch", goToGame )
 
     
     
@@ -170,22 +169,76 @@ function scene:show( event )
             composer.player = event.text
         end
     end
-    self.nickTxt = native.newTextField( display.contentCenterX, display.contentCenterY+10, 250, 70 )
-    self.nickTxt.x = display.contentCenterX
-    self.nickTxt.hasBackground = false
-    self.nickTxt.text = "player"
-    self.nickTxt:addEventListener( "userInput", textListener )
-    composer.player = "player"
-    local tfbkg = display.newImage("i/nickname.png",0,0)
-    tfbkg.x = display.contentCenterX + 23
-    tfbkg.y = display.contentCenterY-12
-    sceneGroup:insert(tfbkg)
-    sceneGroup:insert(self.nickTxt)
+
+    local titleAnim = nil
+    local function setAnim( ... )
+        titleAnim = Anim:new( )
+        local options = nil
+        options = {
+            back = false,
+            frames = 40,
+            w = 450,
+            h = 345,
+            img = "i/anim/title_anim.png",
+            cw = 4050,
+            ch = 1725,
+            scale = 1.0,
+            loop = 1
+        }
+        titleAnim:create("title",options,0,false,1500)
+        titleAnim.anim.xScale = 2
+        titleAnim.anim.yScale = 2
+        titleAnim.anim:play()
+        titleAnim.anim.x = display.contentCenterX
+        titleAnim.anim.y = display.contentCenterY
+        sceneGroup:insert( titleAnim.anim )
+
+        local function onEndAnim( event )
+            -- pb("phase.."..event.phase)
+            if event.phase == "ended" then
+                titleAnim.anim:pause()
+
+
+                local txtPlay = display.newText( "PLAY", 0, 0, "STONE", 50 )
+                txtPlay:setFillColor( black )
+                txtPlay.x = display.contentCenterX - 20
+                txtPlay.y = display.contentCenterY + 35
+                sceneGroup:insert( txtPlay )
+
+                titleAnim.anim:addEventListener( "touch", goToGame )
+            end
+        end
+
+        titleAnim.anim:addEventListener( "sprite", onEndAnim )
+    end
+
+    timer.performWithDelay( 1000, setAnim )
+    
+    
+
+    
+
+
+
+
+
+
+    -- self.nickTxt = native.newTextField( display.contentCenterX, display.contentCenterY+10, 250, 70 )
+    -- self.nickTxt.x = display.contentCenterX
+    -- self.nickTxt.hasBackground = false
+    -- self.nickTxt.text = "player"
+    -- self.nickTxt:addEventListener( "userInput", textListener )
+    -- composer.player = "player"
+    -- local tfbkg = display.newImage("i/nickname.png",0,0)
+    -- tfbkg.x = display.contentCenterX + 23
+    -- tfbkg.y = display.contentCenterY-12
+    -- sceneGroup:insert(tfbkg)
+    -- sceneGroup:insert(self.nickTxt)
     -- local titleText = display.newText( "Input your name:", display.contentCenterX, display.contentCenterY - 50, native.systemFont, 30 )
     -- titleText.x = self.nickTxt.x
     -- sceneGroup:insert(titleText)
 
-    onLoad(self.nickTxt)
+    onLoad(nil)
         
         
     end 

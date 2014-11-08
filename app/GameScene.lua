@@ -82,7 +82,7 @@ function scene:create( event )
         end
         movingControl:initWeapons()
 
-        self:setGameTime(60)
+        self:setGameTime(3)
     end
     
 
@@ -95,7 +95,7 @@ function scene:create( event )
     function onAccel(event)
         self:onAccelerate(event)
     end
-    tileMap.mapCont:addEventListener( "touch", moveTouch )
+    -- tileMap.mapCont:addEventListener( "touch", moveTouch )
     Runtime:addEventListener( "enterFrame", onTick )
     system.setAccelerometerInterval( 50 )
     Runtime:addEventListener("accelerometer", onAccel )
@@ -105,6 +105,7 @@ function scene:create( event )
         local function onStopWorld(e)
             tileMap.mapCont:removeEventListener( "touch", moveTouch )
             Runtime:removeEventListener( "enterFrame", onTick )
+            Runtime:removeEventListener("accelerometer", onAccel )
         end
         SC.listener:addEventListener( "worldStop", onStopWorld )
     end
@@ -119,6 +120,7 @@ function scene:setGameTime(data)
     self.timerTxt.x = self.timerTxt.width/2  + 20  
     self.timerTxt.y = display.pixelWidth - self.timerTxt.height/2
     self.timerTxt:setFillColor(1, 0, 0)
+    -- self.timerTxt.alpha = 0
     self.view:insert(self.timerTxt)
 
     local function recountTimer()
@@ -154,7 +156,7 @@ function scene:showGameResult()
         pl:stopAnim()
         table.insert( data, d )
     end
-
+    
     results:show(data)
     tileMap.mapCont:removeEventListener( "touch", moveTouch )
     Runtime:removeEventListener( "enterFrame", onTick )
@@ -199,11 +201,20 @@ function scene:onHunterMove(event)
 	end
 end
 
+local offSetX = nil
+local offSetY = nil
+
 function scene:onAccelerate(event)
-    -- self.text.text = event.xGravity
-    -- self.text2.text = event.yGravity
-    -- print(event.xGravity + hunter.view.x, event.yGravity*-1 + hunter.view.y)
-    hunter:move(event.yGravity*-10 + hunter.view.x, event.xGravity*-10 + hunter.view.y)
+    -- self.text.text = event.yGravity
+    -- self.text2.text = event.xGravity
+    -- if self.offSetX == nil then
+    --     self.offSetX = 0
+    -- end
+    -- if self.offSetY == nil then
+    --     elf.offSetY = 0
+    -- end
+
+    hunter:move((event.yGravity)*-10 + hunter.view.x, (event.xGravity)*-10 + hunter.view.y)
 end
 
 function scene:worldTick( event )
@@ -245,6 +256,7 @@ function scene:hide( event )
 
         tileMap.mapCont:removeEventListener( "touch", moveTouch )
         Runtime:removeEventListener( "enterFrame", onTick )
+        Runtime:removeEventListener("accelerometer", onAccel )
 
     end 
 end
@@ -255,6 +267,7 @@ function scene:destroy( event )
 
     tileMap.mapCont:removeEventListener( "touch", moveTouch )
     Runtime:removeEventListener( "enterFrame", onTick )
+    Runtime:removeEventListener("accelerometer", onAccel )
 
 
     pb( "DESTORY SCENE" )
