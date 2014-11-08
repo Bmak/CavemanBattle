@@ -30,8 +30,6 @@ settings = {
 
             UIAppFonts =
             {
-                "BARIOL.otf",
-                "ARIAL.ttf",
                 "STONE.ttf"
             }
 		}

@@ -9,7 +9,14 @@ local group = nil
 function ResultTable:show(data)
 	local stage = composer.stage
 	self.group = display.newGroup()
-
+	if "Win" == system.getInfo( "platformName" ) then
+	    STONE = "HW Stone"
+	elseif "Android" == system.getInfo( "platformName" ) then
+	    STONE = "STONE"
+	else
+	    -- Mac and iOS
+	    STONE = "HW Stone"
+	end
 
 	function showWindow( ... )
 		local window = Anim:new( )
