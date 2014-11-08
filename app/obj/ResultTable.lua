@@ -9,15 +9,7 @@ local group = nil
 function ResultTable:show(data)
 	local stage = composer.stage
 	self.group = display.newGroup()
-	if "Win" == system.getInfo( "platformName" ) then
-	    STONE = "HW Stone"
-	elseif "Android" == system.getInfo( "platformName" ) then
-	    STONE = "STONE"
-	else
-	    -- Mac and iOS
-	    STONE = "HW Stone"
-	end
-
+	
 	function showWindow( ... )
 		local window = Anim:new( )
 	    local options = nil
@@ -49,23 +41,23 @@ function ResultTable:show(data)
                 window.anim:pause()
 
                 local txtGroup = display.newGroup()
-                local title = display.newText( "RESULTS", 0, 0, "STONE", 40 )
+                local title = display.newText( "RESULTS", 0, 0, STONE, 40 )
 				title:setFillColor( 1,0,0 )
 				title.x = - 50
 				title.y = - 120
 			 	txtGroup:insert(title)
 
-			 	local nameTitle = display.newText( "NAME", 0, 0, "STONE", 28 )
+			 	local nameTitle = display.newText( "NAME", 0, 0, STONE, 28 )
 		    	nameTitle:setFillColor( black )
 				nameTitle.x = - 250
 				nameTitle.y = - 60
 			    txtGroup:insert(nameTitle)
-			    local killsTitle = display.newText( "KILLS", 0, 0, "STONE", 28 )
+			    local killsTitle = display.newText( "KILLS", 0, 0, STONE, 28 )
 			    killsTitle:setFillColor( black )
 				killsTitle.x = - 50
 				killsTitle.y = - 60
 			    txtGroup:insert(killsTitle)
-			    local deathsTitle = display.newText( "DEATHS", 0, 0, "STONE", 28 )
+			    local deathsTitle = display.newText( "DEATHS", 0, 0, STONE, 28 )
 			    deathsTitle:setFillColor( black )
 				deathsTitle.x = 150
 				deathsTitle.y = - 60
@@ -76,11 +68,11 @@ function ResultTable:show(data)
 			    if data == nil then return end
 			    for k,info in pairs(data) do
 			    	local box = display.newGroup( )
-					local nameTxt = display.newText(info.name, nameTitle.x, 0, "STONE", 23 )
+					local nameTxt = display.newText(info.name, nameTitle.x, 0, STONE, 23 )
 					box:insert(nameTxt)
-					local killsTxt = display.newText(info.kills, killsTitle.x, 0, "STONE", 23 )
+					local killsTxt = display.newText(info.kills, killsTitle.x, 0, STONE, 23 )
 					box:insert(killsTxt)
-					local deathsTxt = display.newText(info.deaths, deathsTitle.x, 0, "STONE", 23 )
+					local deathsTxt = display.newText(info.deaths, deathsTitle.x, 0, STONE, 23 )
 					box:insert(deathsTxt)
 
 					if info.name == composer.player then
@@ -97,7 +89,7 @@ function ResultTable:show(data)
 			    	txtGroup:insert(box)
 			    end
 
-			    local againTxt = display.newText( "AGAIN", 0, 0, "STONE", 33 )
+			    local againTxt = display.newText( "AGAIN", 0, 0, STONE, 33 )
 		    	againTxt:setFillColor( black )
 				againTxt.x = - 50
 				againTxt.y = 220
@@ -119,7 +111,7 @@ function ResultTable:show(data)
         window.anim:addEventListener( "sprite", onEndAnim )
 	end
 
-	timer.performWithDelay( 10, showWindow )
+	timer.performWithDelay( 100, showWindow )
 
 	
 

@@ -170,16 +170,6 @@ function scene:show( event )
         end
     end
 
-    if "Win" == system.getInfo( "platformName" ) then
-        STONE = "HW Stone"
-    elseif "Android" == system.getInfo( "platformName" ) then
-        STONE = "STONE"
-    else
-        -- Mac and iOS
-        STONE = "HW Stone"
-    end
-
-    
     local titleAnim = nil
     local function setAnim( ... )
         titleAnim = Anim:new( )
@@ -209,7 +199,7 @@ function scene:show( event )
                 titleAnim.anim:pause()
 
 
-                local txtPlay = display.newText( "PLAY", 0, 0, "STONE", 50 )
+                local txtPlay = display.newText( "PLAY", 0, 0, STONE, 50 )
                 txtPlay:setFillColor( black )
                 txtPlay.x = display.contentCenterX - 20
                 txtPlay.y = display.contentCenterY + 35
